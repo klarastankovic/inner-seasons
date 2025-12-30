@@ -1,34 +1,40 @@
 package hr.ferit.klarastankovic.innerseasons.data.model
 
+import androidx.compose.ui.graphics.Color
+import hr.ferit.klarastankovic.innerseasons.ui.theme.AutumnOrange
+import hr.ferit.klarastankovic.innerseasons.ui.theme.SpringGreen
+import hr.ferit.klarastankovic.innerseasons.ui.theme.SummerYellow
+import hr.ferit.klarastankovic.innerseasons.ui.theme.WinterBlue
+
 enum class Season(
     val displayName: String,
     val emoji: String,
     val description: String,
-    val color: Long
+    val color: Color
 ) {
     WINTER(
         displayName = "Winter",
         emoji = "❄️",
         description = "Winter is the time of your bleed, when hormones are at their lowest and energy often dips.\nIt is usually a more inward season, ideal for rest, warmth, and doing less where you can.",
-        color = 0xFF4A76A8
+        color = WinterBlue
     ),
     SPRING(
         displayName = "Spring",
         emoji = "🌸",
         description = "Spring begins as bleeding ends; hormones start to rise and many people feel clearer and more energized.\nIt can be a good season for planning, gentle movement, and starting new things.",
-        color = 0xFF9EDB86
+        color = SpringGreen
     ),
     SUMMER(
         displayName = "Summer",
         emoji = "☀️",
         description = "Summer is the ovulation phase, often linked with peak energy, confidence, and sociability.\nThis is a supportive time for visibility, collaboration, and taking on more outward-facing tasks.",
-        color = 0xFFFFE43D
+        color = SummerYellow
     ),
     AUTUMN(
         displayName = "Autumn",
         emoji = "🍂",
         description = "Autumn is the pre-menstrual phase, when hormones shift again and you might feel more inward.\nIt's a time for reflection, completion, and honoring what you need emotionally and physically.",
-        color = 0xFFDE871D
+        color = AutumnOrange
     );
 
     companion object {
