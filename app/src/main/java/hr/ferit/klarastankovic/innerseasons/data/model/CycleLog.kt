@@ -8,7 +8,7 @@ import java.sql.Timestamp
  */
 data class CycleLog(
     var id: String = "",
-    val date: String = "", // Format: "yyyy-MM-dd"
+    val date: String = "", // Format: "yyyy-mm-dd"
     val isPeriod: Boolean = false,
     val mood: Int = 3, // Scale 1-5: 1=😢, 2=😕, 3=😐, 4=🙂, 5=😄
     val sleepHours: Float = 7f, // Range 0-12 hours
