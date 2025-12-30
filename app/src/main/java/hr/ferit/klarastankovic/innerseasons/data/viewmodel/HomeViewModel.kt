@@ -9,6 +9,7 @@ import hr.ferit.klarastankovic.innerseasons.data.model.CycleLog
 import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
 import hr.ferit.klarastankovic.innerseasons.data.repository.CycleRepository
+import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -23,7 +24,12 @@ class HomeViewModel: ViewModel() {
         private set
     var currentCycleDay by mutableStateOf(1)
         private set
+    var daysUntilNextSeason by mutableStateOf(0)
+        private set
+    var nextSeason by mutableStateOf<Pair<Season, LocalDate>?>(null)
     var isLoading by mutableStateOf(true)
+        private set
+    var errorMessage by mutableStateOf<String?>(null)
         private set
 
     init {
@@ -32,31 +38,82 @@ class HomeViewModel: ViewModel() {
 
     private fun loadData() {
         viewModelScope.launch {
-            isLoading = true
+            try {
+                isLoading = true
+                errorMessage = null
 
-            userProfile = repository.getUserProfile()
+                userProfile = repository.getUserProfile()
 
-            val today = LocalDate.now().toString()
-            todayLog = repository.getLogByDate(today)
+                val today = LocalDate.now().toString()
+                todayLog = repository.getLogByDate(today)
 
-            userProfile?.let { profile ->
-                val calculation = CycleCalculator.calculateCurrentState(profile)
-                currentSeason = calculation.season
-                currentCycleDay = calculation.cycleDay
+                userProfile?.let { profile ->
+                    val cycleState = CycleCalculator.calculateCurrentState(profile)
+                    currentSeason = cycleState.season
+                    currentCycleDay = cycleState.cycleDay
+                    daysUntilNextSeason = cycleState.daysUntilNextSeason
+                    nextSeason = CycleCalculator.predictNextSeason(profile)
+                }
+            } catch (e: Exception) {
+                errorMessage = "Failed to load data: ${e.message}"
+            } finally {
+                isLoading = false
             }
-
-            isLoading = false
         }
     }
 
-    fun saveTodayLog(log: CycleLog) {
+    fun saveTodayLog(
+        isPeriod: Boolean,
+        mood: Int,
+        sleepHours: Float,
+        painLevel: Int,
+        waterIntakeMl: Int
+    ) {
         viewModelScope.launch {
-            repository.saveLog(log)
-            todayLog = log
+            try {
+                val today = LocalDate.now().toString()
+
+                val log = CycleLog(
+                    id = todayLog?.id ?: "",
+                    date = today,
+                    isPeriod = isPeriod,
+                    mood = mood,
+                    sleepHours = sleepHours,
+                    painLevel = painLevel,
+                    waterIntakeMl = waterIntakeMl,
+                    season = currentSeason.name
+                )
+
+                val success = repository.saveLog(log)
+                if (success) {
+                    todayLog = log
+                } else {
+                    errorMessage = "Failed to log"
+                }
+            } catch(e: Exception) {
+                errorMessage = "Error saving log: ${e.message}"
+            }
+        }
+    }
+
+    fun updateWaterIntake(amount: Int) {
+        todayLog?.let { log ->
+            val newIntake = log.waterIntakeMl + amount
+            saveTodayLog(
+                isPeriod = log.isPeriod,
+                mood = log.mood,
+                sleepHours = log.sleepHours,
+                painLevel = log.painLevel,
+                waterIntakeMl = newIntake.coerceAtLeast(0)
+            )
         }
     }
 
     fun refreshData() {
         loadData()
+    }
+
+    fun clearError() {
+        errorMessage = null
     }
 }

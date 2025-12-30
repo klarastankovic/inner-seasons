@@ -38,17 +38,16 @@ class CycleRepository {
     // @param date Format: "yyyy-mm-dd"
     suspend fun getLogByDate(date: String): CycleLog? {
         return try {
-            logsCollection
+            val snapshot = logsCollection
                 .whereEqualTo("date", date)
                 .get()
                 .await()
-                .documents
-                .firstOrNull()
-                ?.let { doc ->
-                    doc.toObject(CycleLog::class.java)?.apply {
-                            id = doc.id
-                        }
+
+            snapshot.documents.firstOrNull()?.let { doc ->
+                doc.toObject(CycleLog::class.java)?.apply {
+                    id = doc.id
                 }
+            }
         } catch (e: Exception) {
             null
         }
