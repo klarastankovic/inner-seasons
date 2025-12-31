@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.firebase.firestore)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
