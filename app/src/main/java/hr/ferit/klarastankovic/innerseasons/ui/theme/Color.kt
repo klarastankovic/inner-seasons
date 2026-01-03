@@ -3,6 +3,7 @@ package hr.ferit.klarastankovic.innerseasons.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val PrimaryPink = Color(0xFFF19EDC)
+val BackgroundWhite = Color(0xFAF9F6)
 
 val WinterBlue = Color(0xFF4A76A8)
 val SpringGreen = Color(0xFF9EDB86)
