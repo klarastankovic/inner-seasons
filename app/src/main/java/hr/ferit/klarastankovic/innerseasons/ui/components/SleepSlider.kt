@@ -18,6 +18,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 
+// Sleep hours slider (0-12 hours)
 @Composable
 fun SleepSlider(
     sleepHours: Float,
