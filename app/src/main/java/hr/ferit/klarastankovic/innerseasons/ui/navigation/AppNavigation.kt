@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.HomeViewModel
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.SettingsViewModel
+import hr.ferit.klarastankovic.innerseasons.ui.screens.SplashScreen
 
 object Routes {
     const val SPLASH = "splash"
@@ -36,7 +37,7 @@ fun AppNavigation() {
         startDestination = Routes.SPLASH,
     ) {
         composable(Routes.SPLASH) {
-            SplashScreenPlaceholder(
+            SplashScreen(
                 onNavigateToHome = {
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
@@ -88,12 +89,6 @@ fun AppNavigation() {
 
 
 // PLACEHOLDER SCREENS
-
-@Composable
-fun SplashScreenPlaceholder(onNavigateToHome: () -> Unit) {
-    // TODO: Implement SplashScreen
-    androidx.compose.material3.Text("Splash Screen - TODO")
-}
 
 @Composable
 fun HomeScreenPlaceholder(
