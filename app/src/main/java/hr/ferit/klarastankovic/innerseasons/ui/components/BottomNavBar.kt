@@ -1,6 +1,19 @@
 package hr.ferit.klarastankovic.innerseasons.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -8,12 +21,18 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
+import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
@@ -25,88 +44,112 @@ fun BottomNavBar(
 ) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    NavigationBar(
-        modifier = modifier,
-        containerColor = White,
-        tonalElevation = 8.dp
+    Row(
+        modifier = modifier
+            .padding(horizontal = 20.dp, vertical = 20.dp)
+            .background(BackgroundWhite)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text("Home") },
-            selected = currentRoute == Routes.HOME,
-            onClick = {
-                if (currentRoute != Routes.HOME) {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.HOME) { inclusive = true }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
+        ) {
+            AddLogFAB(
+                onClick = {
+                    navController.navigate(Routes.DAY_LOG) {
+                        popUpTo(Routes.DAY_LOG) { inclusive = true }
                     }
-                }
-            },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryPink,
-                selectedTextColor = PrimaryPink,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
-                indicatorColor = PrimaryPink.copy(alpha = 0.1f)
+                },
+                modifier = Modifier.size(50.dp)
             )
-        )
+        }
 
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.DateRange,
-                    contentDescription = "Calendar",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text("Calendar") },
-            selected = currentRoute == Routes.CALENDAR,
-            onClick = {
-                if (currentRoute != Routes.CALENDAR) {
-                    navController.navigate(Routes.CALENDAR) {
-                        popUpTo(Routes.CALENDAR) { inclusive = true }
-                    }
-                }
-            },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryPink,
-                selectedTextColor = PrimaryPink,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
-                indicatorColor = PrimaryPink.copy(alpha = 0.1f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "Home",
+                modifier = Modifier
+                    .size(24.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                if (currentRoute != Routes.HOME) {
+                                    navController.navigate(Routes.HOME) {
+                                        popUpTo(Routes.HOME) { inclusive = true }
+                                    }
+                                }
+                            }
+                        )
+                    },
+                tint = if (currentRoute == Routes.HOME) PrimaryPink else TextSecondary
             )
-        )
+            Text(
+                "Home",
+                color = if (currentRoute == Routes.HOME) PrimaryPink else TextSecondary
+            )
+        }
 
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text("Settings") },
-            selected = currentRoute == Routes.SETTINGS,
-            onClick = {
-                if (currentRoute != Routes.SETTINGS) {
-                    navController.navigate(Routes.SETTINGS) {
-                        popUpTo(Routes.SETTINGS) { inclusive = true }
-                    }
-                }
-            },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryPink,
-                selectedTextColor = PrimaryPink,
-                unselectedIconColor = TextSecondary,
-                unselectedTextColor = TextSecondary,
-                indicatorColor = PrimaryPink.copy(alpha = 0.1f)
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = "Calendar",
+                modifier = Modifier
+                    .size(24.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                if (currentRoute != Routes.CALENDAR) {
+                                    navController.navigate(Routes.CALENDAR) {
+                                        popUpTo(Routes.CALENDAR) { inclusive = true }
+                                    }
+                                }
+                            }
+                        )
+                    },
+                tint = if (currentRoute == Routes.CALENDAR) PrimaryPink else TextSecondary
             )
-        )
+            Text(
+                "Calendar",
+                color = if (currentRoute == Routes.CALENDAR) PrimaryPink else TextSecondary
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Settings",
+                modifier = Modifier
+                    .size(24.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                if (currentRoute != Routes.SETTINGS) {
+                                    navController.navigate(Routes.SETTINGS) {
+                                        popUpTo(Routes.SETTINGS) { inclusive = true }
+                                    }
+                                }
+                            }
+                        )
+                    },
+                tint = if (currentRoute == Routes.SETTINGS) PrimaryPink else TextSecondary
+            )
+            Text(
+                "Settings",
+                color = if (currentRoute == Routes.SETTINGS) PrimaryPink else TextSecondary
+            )
+        }
     }
 }
 
@@ -119,7 +162,14 @@ fun AddLogFAB(
         onClick = onClick,
         modifier = modifier,
         containerColor = PrimaryPink,
-        contentColor = White
+        contentColor = White,
+        shape = CircleShape,
+        elevation = FloatingActionButtonDefaults.elevation(
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp,
+            focusedElevation = 0.dp,
+            hoveredElevation = 0.dp
+        )
     ) {
         Icon(
             imageVector = Icons.Default.Add,
