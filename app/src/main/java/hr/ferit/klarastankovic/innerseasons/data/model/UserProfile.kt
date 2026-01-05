@@ -6,7 +6,7 @@ package hr.ferit.klarastankovic.innerseasons.data.model
  */
 data class UserProfile(
     var id: String = "default_user",
-    val firstDayOfLastPeriod: String = "", // Format: "yyyy-mm-dd"
+    val firstDayOfLastPeriod: String = "", // Format: "yyyy-MM-dd"
     val averageCycleLength: Int = 28, // Average cycle length in days (default 28)
     val averagePeriodLength: Int = 5, // Average period duration in days (default 5)
     val createdAt: Long = System.currentTimeMillis(),

@@ -11,6 +11,11 @@ import androidx.navigation.navArgument
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.HomeViewModel
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.SettingsViewModel
+import hr.ferit.klarastankovic.innerseasons.ui.screens.CalendarScreen
+import hr.ferit.klarastankovic.innerseasons.ui.screens.DayLogScreen
+import hr.ferit.klarastankovic.innerseasons.ui.screens.HomeScreen
+import hr.ferit.klarastankovic.innerseasons.ui.screens.SeasonsScreen
+import hr.ferit.klarastankovic.innerseasons.ui.screens.SettingsScreen
 import hr.ferit.klarastankovic.innerseasons.ui.screens.SplashScreen
 
 object Routes {
@@ -47,14 +52,14 @@ fun AppNavigation() {
         }
 
         composable(Routes.HOME) {
-            HomeScreenPlaceholder(
+            HomeScreen(
                 viewModel = homeViewModel,
                 navController = navController
             )
         }
 
         composable(Routes.CALENDAR) {
-            CalendarScreenPlaceholder(
+            CalendarScreen(
                 viewModel = calendarViewModel,
                 navController = navController
             )
@@ -67,67 +72,22 @@ fun AppNavigation() {
             )
         ) { backStackEntry ->
             val date = backStackEntry.arguments?.getString("date") ?: ""
-            DayLogScreenPlaceholder(
+            DayLogScreen(
                 date = date,
                 navController = navController
             )
         }
 
         composable(Routes.SEASONS) {
-            SeasonsScreenPlaceholder(navController = navController)
+            SeasonsScreen(navController = navController)
         }
 
         composable(Routes.SETTINGS) {
-            SettingsScreenPlaceholder(
+            SettingsScreen(
                 viewModel = settingsViewModel,
                 navController = navController
             )
         }
     }
 
-}
-
-
-// PLACEHOLDER SCREENS
-
-@Composable
-fun HomeScreenPlaceholder(
-    viewModel: HomeViewModel,
-    navController: NavHostController
-) {
-    // TODO: Implement HomeScreen
-    androidx.compose.material3.Text("Home Screen - TODO")
-}
-
-@Composable
-fun CalendarScreenPlaceholder(
-    viewModel: CalendarViewModel,
-    navController: NavHostController
-) {
-    // TODO: Implement CalendarScreen
-    androidx.compose.material3.Text("Calendar Screen - TODO")
-}
-
-@Composable
-fun DayLogScreenPlaceholder(
-    date: String,
-    navController: NavHostController
-) {
-    // TODO: Implement DayLogScreen
-    androidx.compose.material3.Text("Day Log Screen - TODO: $date")
-}
-
-@Composable
-fun SeasonsScreenPlaceholder(navController: NavHostController) {
-    // TODO: Implement SeasonsScreen
-    androidx.compose.material3.Text("Seasons Screen - TODO")
-}
-
-@Composable
-fun SettingsScreenPlaceholder(
-    viewModel: SettingsViewModel,
-    navController: NavHostController
-) {
-    // TODO: Implement SettingsScreen
-    androidx.compose.material3.Text("Settings Screen - TODO")
 }

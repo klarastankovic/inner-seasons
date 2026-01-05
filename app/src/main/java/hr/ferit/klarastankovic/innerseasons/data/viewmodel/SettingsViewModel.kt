@@ -107,7 +107,7 @@ class SettingsViewModel: ViewModel() {
                 exportSuccess = success
 
                 if (success) {
-                    exportMessage = "Data exported successfully"
+                    exportMessage = "Data file exported to Downloads"
                 } else {
                     exportMessage = "Failed to export data"
                 }

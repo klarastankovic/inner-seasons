@@ -35,7 +35,7 @@ class CycleRepository {
         }
     }
 
-    // @param date Format: "yyyy-mm-dd"
+    // @param date Format: "yyyy-MM-dd"
     suspend fun getLogByDate(date: String): CycleLog? {
         return try {
             val snapshot = logsCollection
@@ -53,8 +53,8 @@ class CycleRepository {
         }
     }
 
-    // @param startDate Format: "yyyy-mm-dd"
-    // @param endDate Format: "yyyy-mm-dd"
+    // @param startDate Format: "yyyy-MM-dd"
+    // @param endDate Format: "yyyy-MM-dd"
     suspend fun getLogsInRange(startDate: String, endDate: String): List<CycleLog> {
         return try {
             logsCollection
