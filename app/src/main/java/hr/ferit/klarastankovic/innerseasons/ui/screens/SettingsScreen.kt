@@ -11,28 +11,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,10 +48,13 @@ import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.SettingsViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
 import hr.ferit.klarastankovic.innerseasons.ui.components.DateInputField
+import hr.ferit.klarastankovic.innerseasons.ui.components.OutlinedNumberInputField
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
+import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
+import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 
 @Composable
 fun SettingsScreen(
@@ -115,7 +125,7 @@ fun SettingsScreen(
                 // MY CYCLE
                 Text(
                     text = "My cycle",
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Black
                 )
@@ -129,7 +139,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "First day of last period:",
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                         color = Black,
                         modifier = Modifier.weight(1f)
@@ -147,12 +157,62 @@ fun SettingsScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Average cycle length:",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Black,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    OutlinedNumberInputField(
+                        value = cycleLengthInput.value,
+                        onValueChange = { cycleLengthInput.value = it },
+                        placeholder = "21-35",
+                        modifier = Modifier.width(100.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Average period length:",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Black,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    OutlinedNumberInputField(
+                        value = periodLengthInput.value,
+                        onValueChange = { cycleLengthInput.value = it },
+                        placeholder = "3-7",
+                        modifier = Modifier.width(100.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // DATA
                 Text(
                     text = "Data",
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Black
                 )
@@ -189,7 +249,7 @@ fun SettingsScreen(
                 // ABOUT
                 Text(
                     text = "About",
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Black
                 )
@@ -204,7 +264,7 @@ fun SettingsScreen(
                         }
                         append(".")
                     },
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     color = TextPrimary
                 )
             }
