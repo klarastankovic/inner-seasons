@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,7 +50,8 @@ fun SeasonIndicatorLarge(
                 .clip(CircleShape)
                 .background(White)
                 .border(1.dp, Black, CircleShape),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
+
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,19 +122,14 @@ fun SeasonBadge(
     Row(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
-            .background(White)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .background(Transparent)
+            .padding(0.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = season.emoji,
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(
-            text = season.displayName,
-            fontSize = 14.sp,
+            text = season.displayName + " " + season.emoji,
+            fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             color = Black
         )
