@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import hr.ferit.klarastankovic.innerseasons.data.model.Season
+import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
@@ -43,38 +45,43 @@ fun SeasonIndicatorLarge(
     ) {
         Box(
             modifier = Modifier
-                .size(200.dp)
+                .size(300.dp)
                 .clip(CircleShape)
                 .background(White)
-                .border(4.dp, Black, CircleShape),
+                .border(1.dp, Black, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(20.dp)
             ) {
                 Text(
-                    text = season.emoji,
-                    fontSize = 64.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = season.displayName,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
+                    text = "Today's season",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
                     color = Black
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = season.displayName + " " + season.emoji,
+                    fontSize = 44.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Black
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "- Day $cycleDay of your cycle -",
+                    fontSize = 20.sp,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "- Day $cycleDay of your cycle -",
-            fontSize = 16.sp,
-            color = TextPrimary,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
 
