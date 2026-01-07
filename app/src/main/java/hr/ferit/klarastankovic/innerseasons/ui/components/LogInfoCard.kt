@@ -21,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
+import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
@@ -37,9 +39,10 @@ fun LogInfoCard(
         modifier = modifier.width(160.dp),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
-            containerColor = PrimaryPink
+            containerColor = White
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(0.5.dp, PrimaryPink)
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
@@ -50,7 +53,7 @@ fun LogInfoCard(
                 Text(
                     text = label,
                     fontSize = 16.sp,
-                    color = White
+                    color = TextSecondary
                 )
 
                 if (showPlusIcon) {
@@ -59,7 +62,7 @@ fun LogInfoCard(
                     Text(
                         text = "+100ml",
                         fontSize = 12.sp,
-                        color = White
+                        color = PrimaryPink
                     )
                 }
             }
@@ -70,8 +73,7 @@ fun LogInfoCard(
                 text = value,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Medium,
-                color = White,
-                textAlign = TextAlign.Right
+                color = Black
             )
         }
     }

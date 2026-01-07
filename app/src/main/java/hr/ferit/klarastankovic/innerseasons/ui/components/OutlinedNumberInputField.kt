@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
+import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 
 @Composable
@@ -42,8 +43,8 @@ fun OutlinedNumberInputField(
                 shape = RoundedCornerShape(12.dp)
             )
             .border(
-                width = 1.dp,
-                color = TextSecondary,
+                width = 0.5.dp,
+                color = TextPrimary,
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 12.dp),

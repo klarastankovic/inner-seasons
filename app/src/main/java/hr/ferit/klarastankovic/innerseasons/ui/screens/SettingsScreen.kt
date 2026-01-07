@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -46,6 +47,8 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
+import hr.ferit.klarastankovic.innerseasons.ui.theme.White
+import java.time.LocalDate
 
 @Composable
 fun SettingsScreen(
@@ -143,19 +146,17 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     DateInputField(
                         value = selectedDate.value,
                         onDateSelected = { newDate ->
                             selectedDate.value = newDate
                         },
                         context = context,
-                        modifier = Modifier.width(144.dp)
+                        modifier = Modifier.width(140.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -170,17 +171,15 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     OutlinedNumberInputField(
                         value = cycleLengthInput.value,
                         onValueChange = { cycleLengthInput.value = it },
                         placeholder = "21-35",
-                        modifier = Modifier.width(100.dp)
+                        modifier = Modifier.width(75.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -195,17 +194,66 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     OutlinedNumberInputField(
                         value = periodLengthInput.value,
-                        onValueChange = { cycleLengthInput.value = it },
+                        onValueChange = { periodLengthInput.value = it },
                         placeholder = "3-7",
-                        modifier = Modifier.width(100.dp)
+                        modifier = Modifier.width(75.dp)
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {
+                            val parsedDate = try {
+                                val parts = selectedDate.value.split("/")
+                                if (parts.size == 3) {
+                                    LocalDate.of(
+                                        parts[2].toInt(),
+                                        parts[1].toInt(),
+                                        parts[0].toInt()
+                                    )
+                                } else null
+                            } catch (e: Exception) {
+                                null
+                            }
+
+                            val cycleLength = cycleLengthInput.value.toIntOrNull() ?: 28
+                            val periodLength = periodLengthInput.value.toIntOrNull() ?: 5
+
+                            if (parsedDate == null) {
+                                viewModel.errorMessage = "Please select a valid date"
+                            } else if (!viewModel.isValidCycleLength(cycleLength)) {
+                                viewModel.errorMessage = "Cycle length must be between 21-35 days"
+                            } else if (!viewModel.isValidPeriodLength(periodLength)) {
+                                viewModel.errorMessage = "Cycle length must be between 3-7 days"
+                            } else {
+                                viewModel.updateProfile(parsedDate, cycleLength, periodLength)
+                            }
+                        },
+                        modifier = Modifier
+                            .height(44.dp)
+                            .width(100.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryPink,
+                            contentColor = White
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
+                        enabled = !viewModel.isSaving
+                    ) {
+                        Text(
+                            text = if (viewModel.isSaving) "Saving" else "Save",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // DATA
                 Text(
@@ -242,7 +290,7 @@ fun SettingsScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // ABOUT
                 Text(
