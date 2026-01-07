@@ -47,6 +47,10 @@ fun SeasonIndicatorLarge(
         Box(
             modifier = Modifier
                 .size(300.dp)
+                .shadow(
+                    elevation = 2.dp,
+                    shape = CircleShape
+                )
                 .clip(CircleShape)
                 .background(White)
                 .border(1.dp, Black, CircleShape),
