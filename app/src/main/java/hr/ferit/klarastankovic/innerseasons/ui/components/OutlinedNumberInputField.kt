@@ -39,12 +39,12 @@ fun OutlinedNumberInputField(
             .height(44.dp)
             .background(
                 color = BackgroundWhite,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             .border(
                 width = 1.dp,
                 color = TextSecondary,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,

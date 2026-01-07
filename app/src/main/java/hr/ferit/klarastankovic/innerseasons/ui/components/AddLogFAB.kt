@@ -1,5 +1,6 @@
 package hr.ferit.klarastankovic.innerseasons.ui.components
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -34,7 +35,7 @@ fun AddLogFAB(
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = "Add Log",
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.fillMaxSize(0.65f)
         )
     }
 }

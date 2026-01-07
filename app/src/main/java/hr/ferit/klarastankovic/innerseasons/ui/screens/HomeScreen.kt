@@ -1,9 +1,11 @@
 package hr.ferit.klarastankovic.innerseasons.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -27,22 +33,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import hr.ferit.klarastankovic.innerseasons.data.model.CycleLog
+import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.HomeViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.AddLogFAB
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
+import hr.ferit.klarastankovic.innerseasons.ui.components.LogInfoCard
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
 import hr.ferit.klarastankovic.innerseasons.ui.components.SeasonIndicatorLarge
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
+import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     navController: NavController
 ) {
-    val userProfile = viewModel.userProfile
     val todayLog = viewModel.todayLog
     val currentSeason = viewModel.currentSeason
     val currentCycleDay = viewModel.currentCycleDay
@@ -56,6 +65,17 @@ fun HomeScreen(
             viewModel.clearError()
         }
     }
+
+    val testLog = CycleLog(
+        id = "test",
+        date = "2026-01-07",
+        isPeriod = false,
+        mood = 4,
+        sleepHours = 7.5f,
+        painLevel = 2,
+        waterIntakeMl = 1500,
+        season = Season.SPRING.name
+    )
 
     Scaffold(
         bottomBar = {
@@ -104,10 +124,10 @@ fun HomeScreen(
                     color = TextPrimary
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Row(
@@ -116,12 +136,12 @@ fun HomeScreen(
                     ) {
                         Text(
                             text = "Today's log",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Medium,
                             color = Black
                         )
 
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         AddLogFAB(
                             onClick = {
@@ -129,14 +149,54 @@ fun HomeScreen(
                                     popUpTo(Routes.DAY_LOG) { inclusive = true }
                                 }
                             },
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(36.dp)
                         )
                     }
 
+//                    if (todayLog == null) {
+//                        Text(
+//                            text = "No log for today yet. Click + to add one!",
+//                            fontSize = 16.sp,
+//                            color = TextPrimary,
+//                            fontStyle = FontStyle.Italic,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    } else {
+                    val displayLog = todayLog ?: testLog
                     LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) { }
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        item {
+                            LogInfoCard(
+                                label = "Mood",
+                                value = displayLog.getMoodEmoji()
+                            )
+                        }
+                        item {
+                            LogInfoCard(
+                                label = "Sleep",
+                                value = displayLog.getFormattedSleepHours()
+                            )
+                        }
+                        item {
+                            LogInfoCard(
+                                label = "Pain",
+                                value = displayLog.getFormattedPainLevel()
+                            )
+                        }
+                        item {
+                            LogInfoCard(
+                                label = "Water",
+                                value = displayLog.getFormattedWaterIntake(),
+                                showPlusIcon = true,
+                                onClick = {
+                                    viewModel.updateWaterIntake(100)
+                                }
+                            )
+                        }
+//                    }
+                    }
                 }
             }
         }

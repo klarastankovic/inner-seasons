@@ -10,7 +10,7 @@ data class CycleLog(
     var id: String = "",
     val date: String = "", // Format: "yyyy-MM-dd"
     val isPeriod: Boolean = false,
-    val mood: Int = 3, // Scale 1-5: 1=😢, 2=😕, 3=😐, 4=🙂, 5=😄
+    val mood: Int = 4, // Scale 1-5: 1=😢, 2=😕, 3=😐, 4=🙂, 5=😄
     val sleepHours: Float = 7f, // Range 0-12 hours
     val painLevel: Int = 0, // Scale 0-10: 0=no pain, 10=severe pain
     val waterIntakeMl: Int = 0, // Water intake in millilitres
@@ -31,5 +31,20 @@ data class CycleLog(
 
     fun getFormattedWaterIntake(): String {
         return "$waterIntakeMl ml"
+    }
+
+    fun getMoodEmoji(): String {
+        return when (mood) {
+            1 -> "😢"
+            2 -> "😕"
+            3 -> "😐"
+            4 -> "🙂"
+            5 -> "😄"
+            else -> "🙂"
+        }
+    }
+
+    fun getFormattedPainLevel(): String {
+        return "$painLevel/10"
     }
 }

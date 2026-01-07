@@ -49,7 +49,7 @@ fun DateInputField(
             .border(
                 width = 1.dp,
                 color = TextSecondary,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             .clickable {
                 android.app.DatePickerDialog(

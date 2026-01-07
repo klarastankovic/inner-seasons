@@ -52,8 +52,7 @@ fun SeasonIndicatorLarge(
                     shape = CircleShape
                 )
                 .clip(CircleShape)
-                .background(White)
-                .border(1.dp, Black, CircleShape),
+                .background(White),
             contentAlignment = Alignment.Center,
 
         ) {
