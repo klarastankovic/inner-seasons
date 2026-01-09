@@ -230,7 +230,7 @@ fun SettingsScreen(
                             } else if (!viewModel.isValidCycleLength(cycleLength)) {
                                 viewModel.errorMessage = "Cycle length must be between 21-35 days"
                             } else if (!viewModel.isValidPeriodLength(periodLength)) {
-                                viewModel.errorMessage = "Cycle length must be between 3-7 days"
+                                viewModel.errorMessage = "Period length must be between 3-7 days"
                             } else {
                                 viewModel.updateProfile(parsedDate, cycleLength, periodLength)
                             }
