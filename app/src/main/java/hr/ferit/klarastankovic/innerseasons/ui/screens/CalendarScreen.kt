@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -22,10 +25,12 @@ import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
 import hr.ferit.klarastankovic.innerseasons.ui.components.Calendar
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
+import hr.ferit.klarastankovic.innerseasons.ui.components.SeasonLegend
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(
     viewModel: CalendarViewModel,
@@ -52,11 +57,15 @@ fun CalendarScreen(
             }
 
             Column(
-                modifier = Modifier.padding(horizontal = 40.dp)
+                modifier = Modifier.padding(horizontal = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Calendar(viewModel = viewModel)
+                Calendar(
+                    viewModel = viewModel,
+                    navController = navController
+                )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
                 Text(
                     text = "Tap a day to view or edit its log",
@@ -65,10 +74,12 @@ fun CalendarScreen(
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(55.dp))
+
+                SeasonLegend(
+                    modifier = Modifier.padding(horizontal = 52.dp)
+                )
             }
-
-
         }
     }
 }

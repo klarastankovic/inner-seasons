@@ -1,9 +1,12 @@
 package hr.ferit.klarastankovic.innerseasons.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -41,9 +45,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
+import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
+import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import java.time.LocalDate
@@ -52,9 +59,11 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Calendar(
     viewModel: CalendarViewModel,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -64,7 +73,7 @@ fun Calendar(
         color = White
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(30.dp)
         ) {
             CalendarHeader(
                 currentMonth = viewModel.currentMonth,
@@ -83,6 +92,7 @@ fun Calendar(
             CalendarGrid(
                 currentMonth = viewModel.currentMonth,
                 selectedDate = viewModel.selectedDate,
+                navController = navController,
                 onDateSelected = { date -> viewModel.selectDate(date) },
                 getSeasonForDate = { date -> viewModel.getSeasonForDate(date) },
                 hasLogForDate = { date -> viewModel.hasLogForDate(date) }
@@ -92,6 +102,7 @@ fun Calendar(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarHeader(
     currentMonth: YearMonth,
@@ -104,9 +115,7 @@ fun CalendarHeader(
     var showYearDropdown by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -119,13 +128,21 @@ fun CalendarHeader(
         }
 
         Row(
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box {
-                TextButton(
-                    onClick = { showMonthDropdown = true },
-                    border = BorderStroke(0.5.dp, TextSecondary)
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { showMonthDropdown = true },
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = currentMonth.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
@@ -133,28 +150,35 @@ fun CalendarHeader(
                         color = Black
                     )
 
-
                     Spacer(modifier = Modifier.width(2.dp))
 
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
                         contentDescription = "More",
-                        tint = Black
+                        tint = PrimaryPink
                     )
                 }
 
                 DropdownMenu(
                     expanded = showMonthDropdown,
-                    onDismissRequest = { showMonthDropdown = false }
+                    onDismissRequest = { showMonthDropdown = false },
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(horizontal = 0.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(White)
+                        .border(1.dp, PrimaryPink, RoundedCornerShape(8.dp))
                 ) {
                     (1..12).forEach { month ->
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    Month.of(month).getDisplayName(
+                                    text = Month.of(month).getDisplayName(
                                         TextStyle.FULL,
                                         Locale.getDefault()
-                                    )
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
                                 )
                             },
                             onClick = {
@@ -166,12 +190,18 @@ fun CalendarHeader(
                 }
             }
 
-            Spacer(modifier = Modifier.width(2.dp))
-
-            Box {
-                TextButton(
-                    onClick = { showYearDropdown = true },
-                    border = BorderStroke(0.5.dp, TextSecondary)
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { showYearDropdown = true },
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = currentMonth.year.toString(),
@@ -184,17 +214,29 @@ fun CalendarHeader(
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
                         contentDescription = "More",
-                        tint = Black
+                        tint = PrimaryPink
                     )
                 }
 
                 DropdownMenu(
                     expanded = showYearDropdown,
-                    onDismissRequest = { showYearDropdown = false }
+                    onDismissRequest = { showYearDropdown = false },
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(horizontal = 0.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(White)
+                        .border(1.dp, PrimaryPink, RoundedCornerShape(8.dp))
                 ) {
                     (2020..2050).forEach { year ->
                         DropdownMenuItem(
-                            text = { Text(year.toString()) },
+                            text = {
+                                Text(
+                                    text = year.toString(),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                           },
                             onClick = {
                                 onYearChange(year)
                                 showYearDropdown = false
@@ -215,10 +257,12 @@ fun CalendarHeader(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarGrid(
     currentMonth: YearMonth,
     selectedDate: LocalDate,
+    navController: NavController,
     onDateSelected: (LocalDate) -> Unit,
     getSeasonForDate: (LocalDate) -> Season,
     hasLogForDate: (LocalDate) -> Boolean
@@ -232,7 +276,7 @@ fun CalendarGrid(
                 Text(
                     text = day,
                     fontSize = 12.sp,
-                    color = TextSecondary,
+                    color = PrimaryPink,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
@@ -277,7 +321,10 @@ fun CalendarGrid(
                                     date = date,
                                     isSelected = isSelected,
                                     season = season,
-                                    onClick = { onDateSelected(date) }
+                                    onClick = {
+                                        onDateSelected(date)
+                                        navController.navigate(Routes.getDayLogRoute(date.toString()))
+                                    }
                                 )
                             }
 
@@ -296,6 +343,7 @@ fun CalendarGrid(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarDayCell(
     date: LocalDate,
@@ -303,26 +351,32 @@ fun CalendarDayCell(
     season: Season?,
     onClick: () -> Unit
 ) {
+    val bgColor = when {
+        isSelected-> PrimaryPink
+        else -> season?.color?.copy(alpha = 0.3f) ?: White
+    }
+
+    val textColor = when {
+        isSelected -> White
+        else -> Black
+    }
+
     Box(
         modifier = Modifier
             .size(40.dp)
             .padding(2.dp)
             .clip(CircleShape)
-            .background(
-                season?.color?.copy(alpha = 0.3f) ?: White
-            )
-            .border(
-                width = if (isSelected) 1.dp else 0.dp,
-                color = if(isSelected) Black else Transparent,
-                shape = CircleShape
-            )
-            .clickable(onClick = onClick),
+            .background(bgColor)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = date.dayOfMonth.toString(),
             fontSize = 14.sp,
-            color = Black,
+            color = textColor,
             textAlign = TextAlign.Center
         )
     }

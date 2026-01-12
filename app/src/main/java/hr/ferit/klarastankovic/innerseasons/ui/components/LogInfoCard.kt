@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
@@ -35,46 +36,72 @@ fun LogInfoCard(
     onClick: (() -> Unit)? = null,
     showPlusIcon: Boolean = false
 ) {
-    Card(
-        modifier = modifier.width(160.dp),
-        shape = MaterialTheme.shapes.small,
-        colors = CardDefaults.cardColors(
-            containerColor = White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(0.5.dp, PrimaryPink)
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
+    if (onClick != null) {
+        Card(
+            modifier = modifier
+                .width(165.dp)
+                .padding(2.dp),
+            shape = MaterialTheme.shapes.small,
+            colors = CardDefaults.cardColors(
+                containerColor = PrimaryPink
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            onClick = onClick
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = label,
-                    fontSize = 16.sp,
-                    color = TextSecondary
-                )
-
-                if (showPlusIcon) {
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = "+100ml",
-                        fontSize = 12.sp,
-                        color = PrimaryPink
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = value,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Medium,
-                color = Black
-            )
+            CardContent(label, value, showPlusIcon)
         }
+    } else {
+        Card(
+            modifier = modifier
+                .width(165.dp)
+                .padding(2.dp),
+            shape = MaterialTheme.shapes.small,
+            colors = CardDefaults.cardColors(
+                containerColor = PrimaryPink
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            CardContent(label, value, showPlusIcon)
+        }
+    }
+}
+
+@Composable
+private fun CardContent(
+    label: String,
+    value: String,
+    showPlusIcon: Boolean
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                fontSize = 16.sp,
+                color = White
+            )
+
+            if (showPlusIcon) {
+                Spacer(modifier = Modifier.width(14.dp))
+
+                Text(
+                    text = "+100ml",
+                    fontSize = 12.sp,
+                    color = White
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = value,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Medium,
+            color = White
+        )
     }
 }

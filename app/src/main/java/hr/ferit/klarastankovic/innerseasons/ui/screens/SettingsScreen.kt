@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -50,6 +51,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
@@ -272,7 +274,7 @@ fun SettingsScreen(
                     modifier = Modifier
                         .wrapContentWidth(Alignment.Start)
                         .height(44.dp)
-                        .width(174.dp),
+                        .width(180.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = BackgroundWhite,
                         contentColor = Black
@@ -285,7 +287,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "📥 Export my logs",
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }

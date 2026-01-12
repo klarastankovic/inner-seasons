@@ -40,7 +40,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.components.AddLogFAB
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
 import hr.ferit.klarastankovic.innerseasons.ui.components.LogInfoCard
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
-import hr.ferit.klarastankovic.innerseasons.ui.components.SeasonIndicatorLarge
+import hr.ferit.klarastankovic.innerseasons.ui.components.SeasonIndicator
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
@@ -103,7 +103,7 @@ fun HomeScreen(
                     .padding(40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SeasonIndicatorLarge(
+                SeasonIndicator(
                     season = currentSeason,
                     cycleDay = currentCycleDay,
                     modifier = Modifier.clickable(
