@@ -47,7 +47,7 @@ This project is licensed under the MIT License.
 
 
 ## Acknowledgments
-Inspired by Maisie Hill's **Period Power*.
+Inspired by Maisie Hill's *Period Power*.
 
 <br>
 
