@@ -29,7 +29,7 @@ class DayLogViewModel : ViewModel() {
     var seasonDescription by mutableStateOf(Season.WINTER.shortDescription)
         private set
     var isPeriod by mutableStateOf(false)
-    var mood by mutableStateOf(4)
+    var mood by mutableIntStateOf(4)
     var sleepHours by mutableFloatStateOf(7f)
     var painLevel by mutableIntStateOf(0)
     var waterIntake by mutableIntStateOf(0)

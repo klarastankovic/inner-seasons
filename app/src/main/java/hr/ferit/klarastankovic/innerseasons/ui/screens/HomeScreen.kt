@@ -153,49 +153,49 @@ fun HomeScreen(
                         )
                     }
 
-//                    if (todayLog == null) {
-//                        Text(
-//                            text = "No log for today yet. Click + to add one!",
-//                            fontSize = 16.sp,
-//                            color = TextPrimary,
-//                            fontStyle = FontStyle.Italic,
-//                            modifier = Modifier.padding(8.dp)
-//                        )
-//                    } else {
-                    val displayLog = todayLog ?: testLog
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        item {
-                            LogInfoCard(
-                                label = "Mood",
-                                value = displayLog.getMoodEmoji()
-                            )
+                    if (todayLog == null) {
+                        Text(
+                            text = "No log for today yet. Click + to add one!",
+                            fontSize = 16.sp,
+                            color = TextPrimary,
+                            fontStyle = FontStyle.Italic,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    } else {
+                        val displayLog = todayLog ?: testLog
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            item {
+                                LogInfoCard(
+                                    label = "Mood",
+                                    value = displayLog.getMoodEmoji()
+                                )
+                            }
+                            item {
+                                LogInfoCard(
+                                    label = "Sleep",
+                                    value = displayLog.getFormattedSleepHours()
+                                )
+                            }
+                            item {
+                                LogInfoCard(
+                                    label = "Pain",
+                                    value = displayLog.getFormattedPainLevel()
+                                )
+                            }
+                            item {
+                                LogInfoCard(
+                                    label = "Water",
+                                    value = displayLog.getFormattedWaterIntake(),
+                                    showPlusIcon = true,
+                                    onClick = {
+                                        viewModel.updateWaterIntake(100)
+                                    }
+                                )
+                            }
                         }
-                        item {
-                            LogInfoCard(
-                                label = "Sleep",
-                                value = displayLog.getFormattedSleepHours()
-                            )
-                        }
-                        item {
-                            LogInfoCard(
-                                label = "Pain",
-                                value = displayLog.getFormattedPainLevel()
-                            )
-                        }
-                        item {
-                            LogInfoCard(
-                                label = "Water",
-                                value = displayLog.getFormattedWaterIntake(),
-                                showPlusIcon = true,
-                                onClick = {
-                                    viewModel.updateWaterIntake(100)
-                                }
-                            )
-                        }
-//                    }
                     }
                 }
             }

@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -8,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
+import hr.ferit.klarastankovic.innerseasons.data.viewmodel.DayLogViewModel
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.HomeViewModel
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.SettingsViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.screens.CalendarScreen
@@ -28,6 +31,7 @@ object Routes {
     fun getDayLogRoute(date: String) = "day_log/$date"
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -35,6 +39,7 @@ fun AppNavigation() {
     val homeViewModel: HomeViewModel = viewModel()
     val calendarViewModel: CalendarViewModel = viewModel()
     val settingsViewModel: SettingsViewModel = viewModel()
+    val dayLogViewModel: DayLogViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -73,7 +78,8 @@ fun AppNavigation() {
             val date = backStackEntry.arguments?.getString("date") ?: ""
             DayLogScreen(
                 date = date,
-                navController = navController
+                navController = navController,
+                viewModel = dayLogViewModel
             )
         }
 

@@ -1,35 +1,81 @@
 package hr.ferit.klarastankovic.innerseasons.ui.screens
 
 import android.graphics.Paint
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import hr.ferit.klarastankovic.innerseasons.data.model.Season
+import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
+import hr.ferit.klarastankovic.innerseasons.data.repository.CycleRepository
+import hr.ferit.klarastankovic.innerseasons.data.viewmodel.DayLogViewModel
+import hr.ferit.klarastankovic.innerseasons.ui.components.MoodSelector
+import hr.ferit.klarastankovic.innerseasons.ui.components.PainLevelSlider
+import hr.ferit.klarastankovic.innerseasons.ui.components.PeriodToggle
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
+import hr.ferit.klarastankovic.innerseasons.ui.components.SeasonBadge
+import hr.ferit.klarastankovic.innerseasons.ui.components.SleepSlider
+import hr.ferit.klarastankovic.innerseasons.ui.components.WaterIntakeCounter
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
+import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
+import hr.ferit.klarastankovic.innerseasons.ui.theme.White
+import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator
 import java.lang.Exception
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DayLogScreen(
     date: String,
-    navController: NavController
+    navController: NavController,
+    viewModel: DayLogViewModel
 ) {
+    val cycleDay = viewModel.cycleDay
+    val season = viewModel.season
+    val seasonDescription = viewModel.seasonDescription
+    val errorMessage = viewModel.errorMessage
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val formattedDate = remember(date) {
         try {
             val input = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -41,7 +87,22 @@ fun DayLogScreen(
         }
     }
 
-    Scaffold { paddingValues ->
+    LaunchedEffect(date) {
+        viewModel.loadDataForDate(date)
+    }
+
+    LaunchedEffect(errorMessage) {
+        viewModel.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,6 +131,103 @@ fun DayLogScreen(
                     title = formattedDate,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)
                 )
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                item {
+                    SeasonBadge(
+                        season = season,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "- Day $cycleDay of your cycle -",
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Black
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = seasonDescription,
+                        fontSize = 14.sp,
+                        color = Black,
+                        fontStyle = FontStyle.Italic,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                 item {
+                     PeriodToggle(
+                         isPeriod = viewModel.isPeriod,
+                         onPeriodChange = { viewModel.isPeriod = it}
+                     )
+                 }
+
+                item {
+                    MoodSelector(
+                        selectedMood = viewModel.mood,
+                        onMoodSelected = { viewModel.mood = it }
+                    )
+                }
+
+                item {
+                    SleepSlider(
+                        sleepHours = viewModel.sleepHours,
+                        onSleepHoursChange = { viewModel.sleepHours = it}
+                    )
+                }
+
+                item {
+                    PainLevelSlider(
+                        painLevel = viewModel.painLevel,
+                        onPainLevelChange = { viewModel.painLevel = it }
+                    )
+                }
+
+                item {
+                    WaterIntakeCounter(
+                        waterIntakeMl = viewModel.waterIntake,
+                        onWaterIntakeChange = { viewModel.waterIntake = it }
+                    )
+                }
+
+                item {
+                    Button(
+                        onClick = {
+                            viewModel.saveLog(date) {
+                                navController.popBackStack()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryPink,
+                            contentColor = White
+                        ),
+                        modifier = Modifier
+                            .height(44.dp)
+                            .width(125.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
+                        enabled = !viewModel.isSaving
+                    ) {
+                        Text(
+                            text = if (viewModel.isSaving) "Saving..." else "Save log",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }

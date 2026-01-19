@@ -1,13 +1,19 @@
 package hr.ferit.klarastankovic.innerseasons.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -16,10 +22,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
@@ -34,7 +45,16 @@ fun WaterIntakeCounter(
     onWaterIntakeChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+            .shadow(
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .background(White)
+            .clip(RoundedCornerShape(12.dp))
+            .padding(22.dp)
+    ) {
         Text(
             text = "Water intake (ml)",
             fontSize = 16.sp,
@@ -45,22 +65,45 @@ fun WaterIntakeCounter(
         Spacer(modifier = Modifier.height(12.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 30.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedTextField(
-                value = "$waterIntakeMl ml",
-                onValueChange = { },
-                readOnly = true,
-                modifier = Modifier.weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = TextPrimary,
-                    disabledBorderColor = TextSecondary.copy(alpha = 0.3f)
-                ),
-                enabled = false,
-                singleLine = true
-            )
+            Row(
+                modifier = Modifier
+                    .width(125.dp)
+                    .height(48.dp)
+                    .background(
+                        color = White,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = TextSecondary.copy(alpha = 0.3f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                BasicTextField(
+                    value = "$waterIntakeMl ml",
+                    onValueChange = { },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        color = TextPrimary,
+                        textAlign = TextAlign.Center
+                    ),
+                    enabled = false,
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        innerTextField()
+                    }
+                )
+            }
 
             Button(
                 onClick = { onWaterIntakeChange(waterIntakeMl + 100) },
@@ -68,7 +111,10 @@ fun WaterIntakeCounter(
                     containerColor = PrimaryPink,
                     contentColor = White
                 ),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(100.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

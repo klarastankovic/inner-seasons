@@ -54,11 +54,9 @@ fun SeasonLegend(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = "${season.displayName} ${season.emoji}",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Black
+                SeasonBadge(
+                    season = season,
+                    fontSize = 14.sp
                 )
             }
         }

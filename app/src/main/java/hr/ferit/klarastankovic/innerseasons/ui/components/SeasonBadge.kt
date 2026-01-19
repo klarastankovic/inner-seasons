@@ -22,7 +22,8 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 fun SeasonBadge(
     season: Season,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    fontWeight: FontWeight = FontWeight.SemiBold
 ) {
     Row(
         modifier = modifier
@@ -35,7 +36,7 @@ fun SeasonBadge(
         Text(
             text = season.displayName + " " + season.emoji,
             fontSize = fontSize,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = fontWeight,
             color = Black
         )
     }
