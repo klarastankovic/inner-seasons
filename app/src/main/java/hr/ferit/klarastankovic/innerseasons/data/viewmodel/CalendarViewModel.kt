@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.data.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -14,6 +16,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 
+@RequiresApi(Build.VERSION_CODES.O)
 class CalendarViewModel: ViewModel() {
     private val repository = CycleRepository()
 
@@ -81,9 +84,53 @@ class CalendarViewModel: ViewModel() {
     }
 
     fun getSeasonForDate(date: LocalDate): Season {
+        val log = getLogForDate(date)
+        if (log != null) {
+            return log.getSeasonEnum()
+        }
+
         return userProfile?.let { profile ->
-            CycleCalculator.calculateSeasonForDate(date, profile)
+            if (profile.firstDayOfLastPeriod.isEmpty()) {
+                Season.WINTER
+            } else {
+                val firstPeriodDate = LocalDate.parse(profile.firstDayOfLastPeriod)
+
+                if (date.isBefore(firstPeriodDate)) {
+                    Season.WINTER
+                } else {
+                    CycleCalculator.calculateStateForDate(date, profile).season
+                }
+            }
         } ?: Season.WINTER
+    }
+
+    fun shouldShowSeasonForDate(date: LocalDate): Boolean {
+        return userProfile?.let { profile ->
+            profile.firstDayOfLastPeriod.isNotEmpty()
+        } ?: false
+    }
+
+    fun isPredictedPeriodStart(date: LocalDate): Boolean {
+        return userProfile?.let { profile ->
+            if (profile.firstDayOfLastPeriod.isEmpty()) {
+                false
+            } else {
+                val firstPeriodDate = LocalDate.parse(profile.firstDayOfLastPeriod)
+
+                if (date.isBefore(firstPeriodDate) || hasLogForDate(date)) {
+                    return false
+                }
+                val cycleState = CycleCalculator.calculateStateForDate(date, profile)
+
+                // Show pink dot ONLY for:
+                // 1. Predicted cycle day 1 (new cycle start)
+                // 2. Future or today
+                // 3. No log exists
+                val isFutureOrToday = !date.isBefore(LocalDate.now())
+
+                cycleState.cycleDay == 1 && isFutureOrToday && !hasLogForDate(date)
+            }
+        } ?: false
     }
 
     fun hasLogForDate(date: LocalDate): Boolean {
@@ -109,8 +156,15 @@ class CalendarViewModel: ViewModel() {
         return dates
     }
 
-    fun refreshData() {
-        loadData()
+    fun refreshCalendarData() {
+        viewModelScope.launch {
+            try {
+                userProfile = repository.getUserProfile()
+                allLogs = repository.getAllLogs()
+            } catch (e: Exception) {
+                errorMessage = "Failed to refresh: ${e.message}"
+            }
+        }
     }
 
     fun clearError() {

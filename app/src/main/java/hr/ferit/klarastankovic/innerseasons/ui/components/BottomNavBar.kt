@@ -46,8 +46,10 @@ fun BottomNavBar(
         ) {
             AddLogFAB(
                 onClick = {
-                    navController.navigate(Routes.DAY_LOG) {
-                        popUpTo(Routes.DAY_LOG) { inclusive = true }
+                    val todayDate = java.time.LocalDate.now().toString()
+
+                    navController.navigate(Routes.getDayLogRoute(todayDate)) {
+                        popUpTo(Routes.HOME) { inclusive = false }
                     }
                 },
                 modifier = Modifier.size(50.dp)

@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.utils
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
 import java.time.LocalDate
@@ -11,6 +13,7 @@ data class CycleState(
     val daysUntilNextSeason: Int
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 object CycleCalculator {
     private fun defaultState(): CycleState {
         return CycleState(

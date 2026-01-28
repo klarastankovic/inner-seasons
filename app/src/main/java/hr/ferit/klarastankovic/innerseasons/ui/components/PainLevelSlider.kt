@@ -37,9 +37,10 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PainLevelSlider(
+    modifier: Modifier = Modifier,
     painLevel: Int,
     onPainLevelChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Column(
         modifier = modifier
@@ -74,9 +75,10 @@ fun PainLevelSlider(
 
         Slider(
             value = painLevel.toFloat(),
-            onValueChange = { onPainLevelChange(it.toInt()) },
+            onValueChange = { if (enabled) onPainLevelChange(it.toInt()) },
             valueRange = 0f..10f,
             steps = 9,
+            enabled = enabled,
             colors = SliderDefaults.colors(
                 thumbColor = PrimaryPink,
                 activeTrackColor = PrimaryPink,

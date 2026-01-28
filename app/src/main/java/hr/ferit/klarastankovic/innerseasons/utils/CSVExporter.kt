@@ -1,15 +1,19 @@
 package hr.ferit.klarastankovic.innerseasons.utils
 
 import android.content.Context
+import android.os.Build
 import android.os.Environment
+import androidx.annotation.RequiresApi
 import androidx.core.os.HeapProfileRequestBuilder
 import hr.ferit.klarastankovic.innerseasons.data.model.CycleLog
 import java.io.File
 import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.String
 
 object CSVExporter {
+    @RequiresApi(Build.VERSION_CODES.O)
     fun exportToCSV(context: Context, logs: List<CycleLog>): Boolean {
         return try {
             val timestamp = LocalDateTime.now()
@@ -26,13 +30,13 @@ object CSVExporter {
                 writer.append("Date,Period,Mood,Sleep Hours,Pain Level,Water Intake (ml),Season\n")
 
                 logs.forEach { log ->
-                    writer.append("${log.date},")
-                    writer.append(("${if (log.isPeriod) "Yes" else "No"},"))
-                    writer.append("${log.mood}")
-                    writer.append("${log.sleepHours}")
-                    writer.append("${log.painLevel}")
-                    writer.append("${log.waterIntakeMl}")
-                    writer.append("${log.season}")
+                    writer.append(log.date).append(",")
+                    writer.append(if (log.isPeriod) "Yes" else "No").append(",")
+                    writer.append(log.mood.toString()).append(",")
+                    writer.append(String.format("%.1f h", log.sleepHours)).append(",")
+                    writer.append(log.painLevel.toString()).append(",")
+                    writer.append(log.waterIntakeMl.toString()).append(",")
+                    writer.append(log.season).append("\n")
                 }
 
                 writer.flush()

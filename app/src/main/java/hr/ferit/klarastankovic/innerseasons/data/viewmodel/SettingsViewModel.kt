@@ -1,6 +1,8 @@
 package hr.ferit.klarastankovic.innerseasons.data.viewmodel
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -40,7 +42,7 @@ class SettingsViewModel: ViewModel() {
                 userProfile = repository.getUserProfile()
 
                 if (userProfile == null) {
-                    userProfile = UserProfile.createDefault()
+                    userProfile = repository.getOrCreateUserProfile()
                 }
             } catch (e: Exception) {
                 errorMessage = "Failed to load profile: ${e.message}"
@@ -51,7 +53,6 @@ class SettingsViewModel: ViewModel() {
     }
 
     fun updateProfile(
-        firstDayOfLastPeriod: LocalDate?,
         averageCycleLength: Int,
         averagePeriodLength: Int
     ) {
@@ -60,12 +61,11 @@ class SettingsViewModel: ViewModel() {
                 isSaving = true
                 errorMessage = null
 
-                val updatedProfile = UserProfile(
-                    id = "default_user",
-                    firstDayOfLastPeriod = firstDayOfLastPeriod?.toString() ?: "",
+                val currentProfile = userProfile ?: repository.getOrCreateUserProfile()
+
+                val updatedProfile = currentProfile.copy(
                     averageCycleLength = averageCycleLength,
                     averagePeriodLength = averagePeriodLength,
-                    createdAt = userProfile?.createdAt ?: System.currentTimeMillis(),
                     updatedAt = System.currentTimeMillis()
                 )
 
@@ -83,6 +83,40 @@ class SettingsViewModel: ViewModel() {
         }
     }
 
+    fun updateProfileWithFirstPeriod(
+        firstDayOfLastPeriod: LocalDate,
+        averageCycleLength: Int,
+        averagePeriodLength: Int
+    ) {
+        viewModelScope.launch {
+            try {
+                isSaving = true
+                errorMessage = null
+
+                val currentProfile = userProfile ?: repository.getOrCreateUserProfile()
+
+                val updatedProfile = currentProfile.copy(
+                    firstDayOfLastPeriod = firstDayOfLastPeriod.toString(),
+                    averageCycleLength = averageCycleLength,
+                    averagePeriodLength = averagePeriodLength,
+                    updatedAt = System.currentTimeMillis()
+                )
+
+                val success = repository.saveUserProfile(updatedProfile)
+                if (success) {
+                    userProfile = updatedProfile
+                } else {
+                    errorMessage = "Failed to save profile"
+                }
+            } catch (e: Exception) {
+                errorMessage = "Error saving profile: ${e.message}"
+            } finally {
+                isSaving = false
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun exportDataToCSV(context: Context) {
         viewModelScope.launch {
             try {

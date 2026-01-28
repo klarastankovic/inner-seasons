@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.data.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -13,6 +15,7 @@ import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 class HomeViewModel: ViewModel() {
     private val repository = CycleRepository()
 
@@ -73,6 +76,8 @@ class HomeViewModel: ViewModel() {
             try {
                 val today = LocalDate.now().toString()
 
+                val finalSeason = if (isPeriod) Season.WINTER else currentSeason
+
                 val log = CycleLog(
                     id = todayLog?.id ?: "",
                     date = today,
@@ -86,7 +91,7 @@ class HomeViewModel: ViewModel() {
 
                 val success = repository.saveLog(log)
                 if (success) {
-                    todayLog = log
+                    loadData()
                 } else {
                     errorMessage = "Failed to log"
                 }
@@ -105,6 +110,15 @@ class HomeViewModel: ViewModel() {
                 sleepHours = log.sleepHours,
                 painLevel = log.painLevel,
                 waterIntakeMl = newIntake.coerceAtLeast(0)
+            )
+        } ?: run {
+            // No log exists, create new one with just water intake
+            saveTodayLog(
+                isPeriod = false,
+                mood = 4,
+                sleepHours = 7f,
+                painLevel = 0,
+                waterIntakeMl = amount.coerceAtLeast(0)
             )
         }
     }

@@ -35,9 +35,10 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SleepSlider(
+    modifier: Modifier = Modifier,
     sleepHours: Float,
     onSleepHoursChange: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Column(
         modifier = modifier
@@ -54,7 +55,7 @@ fun SleepSlider(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Sleep",
+                text = "Sleep hours",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
@@ -72,9 +73,10 @@ fun SleepSlider(
 
         Slider(
             value = sleepHours,
-            onValueChange = onSleepHoursChange,
+            onValueChange = { if (enabled) onSleepHoursChange(it) },
             valueRange = 0f..12f,
             steps = 23, // 0.5 hour increments
+            enabled = enabled,
             colors = SliderDefaults.colors(
                 thumbColor = PrimaryPink,
                 activeTrackColor = PrimaryPink,

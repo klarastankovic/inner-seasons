@@ -48,6 +48,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
+import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import java.time.LocalDate
 
@@ -66,13 +67,11 @@ fun SettingsScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val selectedDate = remember { mutableStateOf(userProfile?.firstDayOfLastPeriod ?: "") }
     val cycleLengthInput = remember { mutableStateOf(userProfile?.averageCycleLength?.toString() ?: "28") }
     val periodLengthInput = remember { mutableStateOf(userProfile?.averagePeriodLength?.toString() ?: "5") }
 
     LaunchedEffect(userProfile) {
         userProfile?.let {
-            selectedDate.value = it.firstDayOfLastPeriod
             cycleLengthInput.value = it.averageCycleLength.toString()
             periodLengthInput.value = it.averagePeriodLength.toString()
         }
@@ -135,27 +134,32 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "First day of last period:",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Black,
-                        modifier = Modifier.weight(1f)
-                    )
+                userProfile?.firstDayOfLastPeriod?.let { firstPeriod ->
+                    if (firstPeriod.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "First day of last period:",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = Black,
+                                modifier = Modifier.weight(1f)
+                            )
 
-                    DateInputField(
-                        value = selectedDate.value,
-                        onDateSelected = { newDate ->
-                            selectedDate.value = newDate
-                        },
-                        context = context,
-                        modifier = Modifier.width(140.dp)
-                    )
+                            Text(
+                                text = firstPeriod,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = TextSecondary,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -211,30 +215,21 @@ fun SettingsScreen(
                 ) {
                     Button(
                         onClick = {
-                            val parsedDate = try {
-                                val parts = selectedDate.value.split("/")
-                                if (parts.size == 3) {
-                                    LocalDate.of(
-                                        parts[2].toInt(),
-                                        parts[1].toInt(),
-                                        parts[0].toInt()
-                                    )
-                                } else null
-                            } catch (e: Exception) {
-                                null
-                            }
-
                             val cycleLength = cycleLengthInput.value.toIntOrNull() ?: 28
                             val periodLength = periodLengthInput.value.toIntOrNull() ?: 5
 
-                            if (parsedDate == null) {
-                                viewModel.errorMessage = "Please select a valid date"
-                            } else if (!viewModel.isValidCycleLength(cycleLength)) {
-                                viewModel.errorMessage = "Cycle length must be between 21-35 days"
-                            } else if (!viewModel.isValidPeriodLength(periodLength)) {
-                                viewModel.errorMessage = "Period length must be between 3-7 days"
-                            } else {
-                                viewModel.updateProfile(parsedDate, cycleLength, periodLength)
+                            when {
+                                !viewModel.isValidCycleLength(cycleLength) -> {
+                                    viewModel.errorMessage =
+                                        "Cycle length must be between 21-35 days"
+                                }
+                                !viewModel.isValidPeriodLength(periodLength) -> {
+                                    viewModel.errorMessage =
+                                        "Period length must be between 3-7 days"
+                                }
+                                else -> {
+                                    viewModel.updateProfile(cycleLength, periodLength)
+                                }
                             }
                         },
                         modifier = Modifier

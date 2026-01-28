@@ -56,7 +56,7 @@ fun SeasonLegend(
 
                 SeasonBadge(
                     season = season,
-                    fontSize = 14.sp
+                    fontSize = 16.sp
                 )
             }
         }

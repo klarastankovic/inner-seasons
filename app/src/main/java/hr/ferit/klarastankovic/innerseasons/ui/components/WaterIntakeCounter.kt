@@ -41,9 +41,10 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 // Water intake counter with +100ml button
 @Composable
 fun WaterIntakeCounter(
+    modifier: Modifier = Modifier,
     waterIntakeMl: Int,
     onWaterIntakeChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Column(
         modifier = modifier
@@ -106,7 +107,7 @@ fun WaterIntakeCounter(
             }
 
             Button(
-                onClick = { onWaterIntakeChange(waterIntakeMl + 100) },
+                onClick = { if (enabled) onWaterIntakeChange(waterIntakeMl + 100) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryPink,
                     contentColor = White
@@ -114,7 +115,8 @@ fun WaterIntakeCounter(
                 modifier = Modifier
                     .height(36.dp)
                     .width(100.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp)
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
+                enabled = enabled
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

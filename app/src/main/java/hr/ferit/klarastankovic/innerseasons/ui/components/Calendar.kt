@@ -39,7 +39,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,12 +50,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.model.Season
+import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
+import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator.isPeriodDay
 import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
@@ -90,12 +95,16 @@ fun Calendar(
             Spacer(modifier = Modifier.height(16.dp))
 
             CalendarGrid(
+                profile = viewModel.userProfile,
                 currentMonth = viewModel.currentMonth,
                 selectedDate = viewModel.selectedDate,
                 navController = navController,
                 onDateSelected = { date -> viewModel.selectDate(date) },
                 getSeasonForDate = { date -> viewModel.getSeasonForDate(date) },
-                hasLogForDate = { date -> viewModel.hasLogForDate(date) }
+                shouldShowSeasonForDate = { date -> viewModel.shouldShowSeasonForDate(date) },
+                isPredictedPeriodStart = { date -> viewModel.isPredictedPeriodStart(date) },
+                hasLogForDate = { date -> viewModel.hasLogForDate(date) },
+                isPeriodDay = { viewModel.isPeriodDay(it) }
             )
         }
     }
@@ -260,12 +269,16 @@ fun CalendarHeader(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarGrid(
+    profile: UserProfile?,
     currentMonth: YearMonth,
     selectedDate: LocalDate,
     navController: NavController,
     onDateSelected: (LocalDate) -> Unit,
     getSeasonForDate: (LocalDate) -> Season,
-    hasLogForDate: (LocalDate) -> Boolean
+    shouldShowSeasonForDate: (LocalDate) -> Boolean,
+    isPredictedPeriodStart: (LocalDate) -> Boolean,
+    hasLogForDate: (LocalDate) -> Boolean,
+    isPeriodDay: (LocalDate) -> Boolean
 ) {
     Column {
         Row(
@@ -314,16 +327,56 @@ fun CalendarGrid(
                             is CalendarDay.Day -> {
                                 val date = calendarDay.date
                                 val isSelected = date == selectedDate
-                                val hasLog = hasLogForDate(date)
-                                val season = if (hasLog) getSeasonForDate(date) else null
+                                val season = if (shouldShowSeasonForDate(date)) {
+                                    getSeasonForDate(date)
+                                } else {
+                                    null
+                                }
+                                val isPredictedStart = isPredictedPeriodStart(date)
 
                                 CalendarDayCell(
                                     date = date,
                                     isSelected = isSelected,
                                     season = season,
+                                    isPredictedPeriodStart = isPredictedStart,
+                                    isFutureDate = date.isAfter(LocalDate.now()),
+                                    hasLog = hasLogForDate(date),
+                                    isPeriodDay = isPeriodDay(date),
                                     onClick = {
-                                        onDateSelected(date)
-                                        navController.navigate(Routes.getDayLogRoute(date.toString()))
+                                        val today = LocalDate.now()
+                                        val firstPeriodDate = try {
+                                            if (profile?.firstDayOfLastPeriod?.isNotEmpty() == true) {
+                                                LocalDate.parse(profile.firstDayOfLastPeriod)
+                                            } else {
+                                                null
+                                            }
+                                        } catch (e: Exception) {
+                                            null
+                                        }
+
+                                        when {
+                                            date.isAfter(today) -> return@CalendarDayCell
+
+                                            firstPeriodDate != null && date.isBefore(firstPeriodDate) -> {
+                                                navController.navigate(Routes.getNoDataRoute(date.toString()))
+                                            }
+
+                                            date == today -> {
+                                                onDateSelected(date)
+                                                navController.navigate(Routes.getDayLogRoute(date.toString()))
+                                            }
+
+                                            hasLogForDate(date) -> {
+                                                onDateSelected(date)
+                                                navController.navigate(Routes.getDayLogRoute(date.toString()))
+                                            }
+
+                                            firstPeriodDate != null /*&& !date.isAfter(today)*/ -> {
+                                                navController.navigate(Routes.getViewOnlyRoute(date.toString()))
+                                            }
+
+                                            else -> return@CalendarDayCell
+                                        }
                                     }
                                 )
                             }
@@ -349,11 +402,15 @@ fun CalendarDayCell(
     date: LocalDate,
     isSelected: Boolean,
     season: Season?,
+    isPredictedPeriodStart: Boolean,
+    isFutureDate: Boolean,
+    hasLog: Boolean,
+    isPeriodDay: Boolean,
     onClick: () -> Unit
 ) {
     val bgColor = when {
         isSelected-> PrimaryPink
-        else -> season?.color?.copy(alpha = 0.3f) ?: White
+        else -> season?.color ?: White
     }
 
     val textColor = when {
@@ -366,7 +423,38 @@ fun CalendarDayCell(
             .size(40.dp)
             .padding(2.dp)
             .clip(CircleShape)
-            .background(bgColor)
+            .then(
+                when {
+                    isSelected -> Modifier.background(PrimaryPink)
+                    season != null -> Modifier.drawBehind {
+                        drawCircle(
+                            color = bgColor,
+                            style = Stroke(
+                                width = 2.dp.toPx(),
+                                pathEffect = PathEffect.dashPathEffect(
+                                    intervals = floatArrayOf(4f, 4f),
+                                    phase = 0f
+                                )
+                            )
+                        )
+
+                        // Only draw dot for PREDICTED period starts (not actual logged periods)
+                        if (isPredictedPeriodStart && !hasLog) {
+                            drawCircle(
+                                color = bgColor, // maybe change to PrimaryPink
+                                radius = 3.dp.toPx(),
+                                center = center
+                            )
+                        }
+                    }
+                    isFutureDate -> Modifier
+                    else -> Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick
+                    )
+                }
+            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null

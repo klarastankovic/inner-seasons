@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -47,6 +49,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -58,6 +61,10 @@ fun HomeScreen(
     val errorMessage = viewModel.errorMessage
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(navController.currentBackStackEntry) {
+        viewModel.refreshData()
+    }
 
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
@@ -143,14 +150,18 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        AddLogFAB(
-                            onClick = {
-                                navController.navigate(Routes.DAY_LOG) {
-                                    popUpTo(Routes.DAY_LOG) { inclusive = true }
-                                }
-                            },
-                            modifier = Modifier.size(36.dp)
-                        )
+                        if (todayLog == null) {
+                            AddLogFAB(
+                                onClick = {
+                                    val todayDate = java.time.LocalDate.now().toString()
+
+                                    navController.navigate(Routes.getDayLogRoute(todayDate)) {
+                                        popUpTo(Routes.HOME) { inclusive = false }
+                                    }
+                                },
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
                     }
 
                     if (todayLog == null) {

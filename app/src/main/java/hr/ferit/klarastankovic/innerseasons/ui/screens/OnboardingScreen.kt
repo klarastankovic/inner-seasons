@@ -186,8 +186,7 @@ fun OnboardingScreen(
                             viewModel.errorMessage = "Period length must be between 3-7 days"
                         }
                         else -> {
-                            viewModel.updateProfile(parsedDate, cycleLength, periodLength)
-                            // ← Navigate to HOME after successful setup
+                            viewModel.updateProfileWithFirstPeriod(parsedDate, cycleLength, periodLength)
                             navController.navigate(Routes.HOME) {
                                 popUpTo(Routes.ONBOARDING) { inclusive = true }
                             }

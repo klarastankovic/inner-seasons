@@ -39,18 +39,32 @@ class DayLogViewModel : ViewModel() {
         private set
     var errorMessage by mutableStateOf<String?>(null)
 
+    fun updatePeriodStatus(isPeriodDay: Boolean) {
+        isPeriod = isPeriodDay
+
+        if (isPeriodDay && season != Season.WINTER) {
+            season = Season.WINTER
+            seasonDescription = Season.WINTER.shortDescription
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadDataForDate(date: String) {
         viewModelScope.launch {
             try {
-                userProfile = repository.getUserProfile()
+                resetStateToDefaults()
 
+                userProfile = repository.getUserProfile()
                 userProfile?.let { profile ->
                     val localDate = LocalDate.parse(date)
                     val state = CycleCalculator.calculateStateForDate(localDate, profile)
                     cycleDay = state.cycleDay
                     season = state.season
                     seasonDescription = season.shortDescription
+
+                    if (season == Season.WINTER) {
+                        isPeriod = true
+                    }
 
                     val existingLog = repository.getLogByDate(date)
                     existingLog?.let { log ->
@@ -59,6 +73,9 @@ class DayLogViewModel : ViewModel() {
                         sleepHours = log.sleepHours
                         painLevel = log.painLevel
                         waterIntake = log.waterIntakeMl
+
+                        season = log.getSeasonEnum()
+                        seasonDescription = season.shortDescription
                     }
                 }
             } catch (e: Exception) {
@@ -72,8 +89,11 @@ class DayLogViewModel : ViewModel() {
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
-            isSaving = true
             try {
+                isSaving = true
+
+                val finalSeason = if (isPeriod) Season.WINTER else season
+
                 val log = CycleLog(
                     date = date,
                     isPeriod = isPeriod,
@@ -115,5 +135,13 @@ class DayLogViewModel : ViewModel() {
 
     fun resetSaveStatus() {
         saveSuccess = null
+    }
+
+    private fun resetStateToDefaults() {
+        isPeriod = false
+        mood = 4
+        sleepHours = 7f
+        painLevel = 0
+        waterIntake = 0
     }
 }

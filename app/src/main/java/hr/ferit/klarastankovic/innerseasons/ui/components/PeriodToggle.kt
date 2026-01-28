@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
@@ -26,9 +27,11 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 // Toggle switch for period tracking
 @Composable
 fun PeriodToggle(
+    modifier: Modifier = Modifier,
     isPeriod: Boolean,
     onPeriodChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    season: Season = Season.WINTER,
+    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier
@@ -48,14 +51,14 @@ fun PeriodToggle(
             checked = isPeriod,
             onCheckedChange = onPeriodChange,
             modifier = Modifier.scale(0.8f),
+            enabled = enabled,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = White,
-                checkedTrackColor = PrimaryPink,
+                checkedTrackColor = if (season == Season.WINTER) PrimaryPink else PrimaryPink,
                 uncheckedThumbColor = White,
                 uncheckedTrackColor = TextSecondary.copy(alpha = 0.3f),
                 uncheckedBorderColor = Transparent
-            ),
-            interactionSource = remember { MutableInteractionSource() }
+            )
         )
     }
 }

@@ -39,9 +39,10 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
 @Composable
 fun MoodSelector(
+    modifier: Modifier = Modifier,
     selectedMood: Int,
     onMoodSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Column(
         modifier = modifier
@@ -54,7 +55,7 @@ fun MoodSelector(
             .padding(22.dp)
     ) {
         Text(
-            text = "Mood",
+            text = "How are you feeling?",
             modifier = Modifier.padding(start = 4.dp),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
@@ -72,35 +73,40 @@ fun MoodSelector(
                 emoji = "😢",
                 moodValue = 1,
                 isSelected = selectedMood == 1,
-                onClick = { onMoodSelected(1) }
+                onClick = { if (enabled) onMoodSelected(1) },
+                enabled = enabled
             )
 
             MoodOption(
                 emoji = "😕",
                 moodValue = 2,
                 isSelected = selectedMood == 2,
-                onClick = { onMoodSelected(2) }
+                onClick = { if (enabled) onMoodSelected(2) },
+                enabled = enabled
             )
 
             MoodOption(
                 emoji = "😐",
                 moodValue = 3,
                 isSelected = selectedMood == 3,
-                onClick = { onMoodSelected(3) }
+                onClick = { if (enabled) onMoodSelected(3) },
+                enabled = enabled
             )
 
             MoodOption(
                 emoji = "🙂",
                 moodValue = 4,
                 isSelected = selectedMood == 4,
-                onClick = { onMoodSelected(4) }
+                onClick = { if (enabled) onMoodSelected(4) },
+                enabled = enabled
             )
 
             MoodOption(
                 emoji = "😄",
                 moodValue = 5,
                 isSelected = selectedMood == 5,
-                onClick = { onMoodSelected(5) }
+                onClick = { if (enabled) onMoodSelected(5) },
+                enabled = enabled
             )
         }
     }
@@ -111,7 +117,8 @@ private fun MoodOption(
     emoji: String,
     moodValue: Int,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
     Box(
         modifier = Modifier
@@ -121,7 +128,8 @@ private fun MoodOption(
             .clickable(
                 onClick = onClick,
                 indication = null,
-                interactionSource = remember { MutableInteractionSource() }
+                interactionSource = remember { MutableInteractionSource() },
+                enabled = enabled
             ),
         contentAlignment = Alignment.Center
     ) {

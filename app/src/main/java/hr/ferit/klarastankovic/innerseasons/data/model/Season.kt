@@ -67,7 +67,7 @@ enum class Season(
             daysSinceLastPeriod: Int,
             cycleLength: Int
         ): Season {
-            val normalizedDay = ((daysSinceLastPeriod - 1) * 28 / cycleLength) + 1
+            val normalizedDay = (daysSinceLastPeriod * 28 / cycleLength) + 1
             return fromCycleDay(normalizedDay)
         }
     }
