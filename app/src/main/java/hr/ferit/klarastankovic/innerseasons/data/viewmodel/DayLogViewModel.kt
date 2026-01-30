@@ -105,14 +105,7 @@ class DayLogViewModel : ViewModel() {
                     timestamp = System.currentTimeMillis()
                 )
 
-                val existingLog = repository.getLogByDate(date)
-                val logToSave = if (existingLog != null) {
-                    log.copy(id = existingLog.id)
-                } else {
-                    log
-                }
-
-                val success = repository.saveLog(logToSave)
+                val success = repository.saveLog(log)
                 saveSuccess = success
 
                 if (success) {

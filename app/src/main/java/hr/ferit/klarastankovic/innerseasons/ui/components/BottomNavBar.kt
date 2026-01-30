@@ -1,5 +1,7 @@
 package hr.ferit.klarastankovic.innerseasons.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +27,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomNavBar(
     navController: NavController,

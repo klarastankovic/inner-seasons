@@ -102,24 +102,21 @@ class HomeViewModel: ViewModel() {
     }
 
     fun updateWaterIntake(amount: Int) {
-        todayLog?.let { log ->
-            val newIntake = log.waterIntakeMl + amount
-            saveTodayLog(
-                isPeriod = log.isPeriod,
-                mood = log.mood,
-                sleepHours = log.sleepHours,
-                painLevel = log.painLevel,
-                waterIntakeMl = newIntake.coerceAtLeast(0)
+        viewModelScope.launch {
+            val todayDate = LocalDate.now().toString()
+            val currentLog = repository.getLogByDate(todayDate)
+                ?: CycleLog(date = todayDate, deviceId = "")
+
+            val newWaterLevel = currentLog.waterIntakeMl + amount
+
+            val updatedLog = currentLog.copy(
+                waterIntakeMl = newWaterLevel,
+                timestamp = System.currentTimeMillis()
             )
-        } ?: run {
-            // No log exists, create new one with just water intake
-            saveTodayLog(
-                isPeriod = false,
-                mood = 4,
-                sleepHours = 7f,
-                painLevel = 0,
-                waterIntakeMl = amount.coerceAtLeast(0)
-            )
+
+            repository.saveLog(updatedLog)
+
+            todayLog = updatedLog
         }
     }
 

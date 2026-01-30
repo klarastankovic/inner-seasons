@@ -25,6 +25,8 @@ class SettingsViewModel: ViewModel() {
         private set
     var isExporting by mutableStateOf(false)
         private set
+    var isDeleting by mutableStateOf(false)
+        private set
     var exportSuccess by mutableStateOf<Boolean?>(null)
         private set
     var exportMessage by mutableStateOf<String?>(null)
@@ -170,5 +172,17 @@ class SettingsViewModel: ViewModel() {
 
     fun isValidPeriodLength(length: Int): Boolean {
         return length in UserProfile.PERIOD_LENGHT_RANGE
+    }
+
+    fun deleteAllLogs(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            isDeleting = true
+            val success = repository.deleteAllLogs()
+            if (success) {
+                // This is where you'd also clear local preferences if needed
+                onComplete()
+            }
+            isDeleting = false
+        }
     }
 }

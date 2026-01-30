@@ -45,16 +45,16 @@ class CycleRepository {
     suspend fun getLogByDate(date: String): CycleLog? {
         return try {
             val deviceId = getDeviceId()
-            val snapshot = logsCollection
-                .whereEqualTo("deviceId", deviceId)
-                .whereEqualTo("date", date)
-                .get()
-                .await()
+            val docId = "${deviceId}_${date}"
 
-            snapshot.documents.firstOrNull()?.let { doc ->
+            val doc = logsCollection.document(docId).get().await()
+
+            if (doc.exists()) {
                 doc.toObject(CycleLog::class.java)?.apply {
                     id = doc.id
                 }
+            } else {
+                null
             }
         } catch (e: Exception) {
             null
@@ -87,13 +87,14 @@ class CycleRepository {
     suspend fun saveLog(log: CycleLog): Boolean {
         return try {
             val deviceId = getDeviceId()
-            val logToSave = log.copy(deviceId = deviceId)
+            val specificLogId = "${deviceId}_${log.date}"
 
-            if (logToSave.id.isEmpty()) {
-                logsCollection.add(logToSave).await()
-            } else {
-                logsCollection.document(logToSave.id).set(logToSave).await()
-            }
+            val logToSave = log.copy(
+                id = specificLogId,
+                deviceId = deviceId
+            )
+
+            logsCollection.document(specificLogId).set(logToSave).await()
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -119,10 +120,20 @@ class CycleRepository {
 
     suspend fun deleteAllLogs(): Boolean {
         return try {
-            val logs = getAllLogs()
-            logs.forEach { log ->
-                logsCollection.document(log.id).delete().await()
+            val deviceId = getDeviceId()
+            val batch = db.batch()
+
+            val logs = logsCollection.whereEqualTo("deviceId", deviceId).get().await()
+            for (doc in logs) {
+                batch.delete(doc.reference)
             }
+
+            val profileRef = profilesCollection.document(deviceId)
+            batch.delete(profileRef)
+
+            batch.commit().await()
+
+            DeviceIdManager.clearDeviceId()
             true
         } catch (e: Exception) {
             false
