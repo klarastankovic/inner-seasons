@@ -38,8 +38,16 @@ object CycleCalculator {
         }
 
         val lastPeriodDate = LocalDate.parse(profile.firstDayOfLastPeriod)
-        val daysBetween = ChronoUnit.DAYS.between(lastPeriodDate, date).toInt()
 
+        if (date.isBefore(lastPeriodDate)) {
+            return CycleState(
+                season = Season.WINTER,
+                cycleDay = 0,
+                daysUntilNextSeason = 0
+            )
+        }
+
+        val daysBetween = ChronoUnit.DAYS.between(lastPeriodDate, date).toInt()
         val cycleLength = profile.averageCycleLength
         val periodLength = profile.averagePeriodLength
 

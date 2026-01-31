@@ -57,6 +57,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
+import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator
 import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator.isPeriodDay
 import java.time.LocalDate
 import java.time.Month
@@ -103,8 +104,7 @@ fun Calendar(
                 getSeasonForDate = { date -> viewModel.getSeasonForDate(date) },
                 shouldShowSeasonForDate = { date -> viewModel.shouldShowSeasonForDate(date) },
                 isPredictedPeriodStart = { date -> viewModel.isPredictedPeriodStart(date) },
-                hasLogForDate = { date -> viewModel.hasLogForDate(date) },
-                isPeriodDay = { viewModel.isPeriodDay(it) }
+                hasLogForDate = { date -> viewModel.hasLogForDate(date) }
             )
         }
     }
@@ -277,8 +277,7 @@ fun CalendarGrid(
     getSeasonForDate: (LocalDate) -> Season,
     shouldShowSeasonForDate: (LocalDate) -> Boolean,
     isPredictedPeriodStart: (LocalDate) -> Boolean,
-    hasLogForDate: (LocalDate) -> Boolean,
-    isPeriodDay: (LocalDate) -> Boolean
+    hasLogForDate: (LocalDate) -> Boolean
 ) {
     Column {
         Row(
@@ -326,8 +325,11 @@ fun CalendarGrid(
                             is CalendarDay.Day -> {
                                 val date = calendarDay.date
                                 val isSelected = date == selectedDate
+                                val state = profile?.let {
+                                    CycleCalculator.calculateStateForDate(date, it)
+                                }
                                 val season = if (shouldShowSeasonForDate(date)) {
-                                    getSeasonForDate(date)
+                                    state?.season
                                 } else {
                                     null
                                 }
@@ -337,10 +339,10 @@ fun CalendarGrid(
                                     date = date,
                                     isSelected = isSelected,
                                     season = season,
+                                    cycleDay = state?.cycleDay ?: 0,
                                     isPredictedPeriodStart = isPredictedStart,
                                     isFutureDate = date.isAfter(LocalDate.now()),
                                     hasLog = hasLogForDate(date),
-                                    isPeriodDay = isPeriodDay(date),
                                     onClick = {
                                         val today = LocalDate.now()
                                         val firstPeriodDate = try {
@@ -401,15 +403,16 @@ fun CalendarDayCell(
     date: LocalDate,
     isSelected: Boolean,
     season: Season?,
+    cycleDay: Int,
     isPredictedPeriodStart: Boolean,
     isFutureDate: Boolean,
     hasLog: Boolean,
-    isPeriodDay: Boolean,
     onClick: () -> Unit
 ) {
     val bgColor = when {
         isSelected-> PrimaryPink
-        else -> season?.color ?: White
+        cycleDay > 0 -> season?.color ?: Transparent
+        else -> White
     }
 
     val textColor = when {
@@ -425,7 +428,7 @@ fun CalendarDayCell(
             .then(
                 when {
                     isSelected -> Modifier.background(PrimaryPink)
-                    season != null -> Modifier.drawBehind {
+                    season != null && cycleDay > 0 -> Modifier.drawBehind {
                         drawCircle(
                             color = bgColor,
                             style = Stroke(

@@ -56,10 +56,9 @@ enum class Season(
             cycleLength: Int,
             periodLength: Int
         ): Season {
-            // 1. Calculate the current day in the cycle (e.g., Day 1 to Day 35)
-            val cycleDay = (daysSinceLastPeriod % cycleLength) + 1
+            if (daysSinceLastPeriod < 0) return WINTER
 
-            // 2. Calculate progress as a percentage (0.0 to 1.0)
+            val cycleDay = (daysSinceLastPeriod % cycleLength) + 1
             val progress = cycleDay.toFloat() / cycleLength.toFloat()
 
             return when {
