@@ -346,10 +346,11 @@ fun SettingsScreen(
                     border = BorderStroke(
                         width = 1.dp,
                         color = PrimaryPink
-                    )
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp)
                 ) {
                     Text(
-                        text = "Delete My Data",
+                        text = "Delete my data",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
                     )

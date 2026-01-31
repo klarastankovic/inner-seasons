@@ -299,7 +299,6 @@ fun CalendarGrid(
         Spacer(modifier = Modifier.width(4.dp))
 
         val firstDayOfMonth = currentMonth.atDay(1)
-        val lastDayOfMonth = currentMonth.atEndOfMonth()
         val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
         val daysInMonth = currentMonth.lengthOfMonth()
 
@@ -441,7 +440,7 @@ fun CalendarDayCell(
                         // Only draw dot for PREDICTED period starts (not actual logged periods)
                         if (isPredictedPeriodStart && !hasLog) {
                             drawCircle(
-                                color = bgColor, // maybe change to PrimaryPink
+                                color = PrimaryPink,
                                 radius = 3.dp.toPx(),
                                 center = center
                             )

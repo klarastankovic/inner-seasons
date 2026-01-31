@@ -46,29 +46,28 @@ enum class Season(
         /**
          * Determines the season based on day of cycle (1-28+)
          * Uses fixed ranges for typical 28-day cycle:
-         * - Winter: days 1-5 (menstruation)
-         * - Spring: days 6-13 (follicular)
-         * - Summer: days 14-17 (ovulatory)
-         * - Autumn: days 18-end (luteal)
+         * - Winter: days 1-5 (menstruation) periodLength
+         * - Spring: days 6-13 (follicular) 18-45% of the cycle
+         * - Summer: days 14-17 (ovulatory) 45-60% of the cycle
+         * - Autumn: days 18-end (luteal) 60-100% of the cycle
          */
-        fun fromCycleDay(cycleDay: Int): Season {
-            return when (cycleDay) {
-                in 1..5 -> WINTER
-                in 6..13 -> SPRING
-                in 14..17 -> SUMMER
+        fun fromCycleDay(
+            daysSinceLastPeriod: Int,
+            cycleLength: Int,
+            periodLength: Int
+        ): Season {
+            // 1. Calculate the current day in the cycle (e.g., Day 1 to Day 35)
+            val cycleDay = (daysSinceLastPeriod % cycleLength) + 1
+
+            // 2. Calculate progress as a percentage (0.0 to 1.0)
+            val progress = cycleDay.toFloat() / cycleLength.toFloat()
+
+            return when {
+                cycleDay <= periodLength -> WINTER
+                progress <= 0.45f -> SPRING
+                progress <= 0.60f -> SUMMER
                 else -> AUTUMN
             }
-        }
-
-        /**
-         * Alternative: scale to user's actual cycle length
-         */
-        fun fromCycleDayScaled(
-            daysSinceLastPeriod: Int,
-            cycleLength: Int
-        ): Season {
-            val normalizedDay = (daysSinceLastPeriod * 28 / cycleLength) + 1
-            return fromCycleDay(normalizedDay)
         }
     }
 }

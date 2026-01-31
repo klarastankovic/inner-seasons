@@ -112,24 +112,11 @@ class CalendarViewModel: ViewModel() {
 
     fun isPredictedPeriodStart(date: LocalDate): Boolean {
         return userProfile?.let { profile ->
-            if (profile.firstDayOfLastPeriod.isEmpty()) {
-                false
-            } else {
-                val firstPeriodDate = LocalDate.parse(profile.firstDayOfLastPeriod)
+            val cycleState = CycleCalculator.calculateStateForDate(date, profile)
 
-                if (date.isBefore(firstPeriodDate) || hasLogForDate(date)) {
-                    return false
-                }
-                val cycleState = CycleCalculator.calculateStateForDate(date, profile)
+            val isFutureOrToday = !date.isBefore(LocalDate.now())
 
-                // Show pink dot ONLY for:
-                // 1. Predicted cycle day 1 (new cycle start)
-                // 2. Future or today
-                // 3. No log exists
-                val isFutureOrToday = !date.isBefore(LocalDate.now())
-
-                cycleState.cycleDay == 1 && isFutureOrToday && !hasLogForDate(date)
-            }
+            cycleState.cycleDay == 1 && isFutureOrToday && !hasLogForDate(date)
         } ?: false
     }
 

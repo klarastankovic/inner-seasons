@@ -38,34 +38,53 @@ object CycleCalculator {
         }
 
         val lastPeriodDate = LocalDate.parse(profile.firstDayOfLastPeriod)
-        val daysSinceLastPeriod = ChronoUnit.DAYS.between(lastPeriodDate, date).toInt()
+        val daysBetween = ChronoUnit.DAYS.between(lastPeriodDate, date).toInt()
 
-        val cycleDay = calculateCycleDay(daysSinceLastPeriod, profile.averageCycleLength)
+        val cycleLength = profile.averageCycleLength
+        val periodLength = profile.averagePeriodLength
 
-        val season = Season.fromCycleDayScaled(
-            daysSinceLastPeriod = daysSinceLastPeriod,
-            cycleLength = profile.averageCycleLength
+        val cycleDay = calculateCycleDay(
+            daysSinceLastPeriod = daysBetween,
+            cycleLength = cycleLength
         )
 
-        val daysUntilNext = calculateDaysUntilNextSeason(cycleDay, profile.averageCycleLength)
+        val season = Season.fromCycleDay(
+            daysSinceLastPeriod = daysBetween,
+            cycleLength = cycleLength,
+            periodLength = periodLength
+        )
+
+        val daysUntilNextSeason = calculateDaysUntilNextSeason(cycleDay, cycleLength, periodLength, season)
 
         return CycleState(
             season = season,
             cycleDay = cycleDay,
-            daysUntilNextSeason = daysUntilNext
+            daysUntilNextSeason = daysUntilNextSeason
         )
     }
 
-    fun calculateDaysUntilNextSeason(cycleDay: Int, cycleLength: Int): Int {
-        val normalizedDay = ((cycleDay - 1) * 28 / cycleLength) + 1
-
-        return when (normalizedDay) {
-            in 1..5 -> 6 - normalizedDay // Days until Spring
-            in 6..13 -> 14 - normalizedDay // Days until Summer
-            in 14..17 -> 18 - normalizedDay // Days until Autumn
-            else -> { // Days until Winter (next cycle)
-                val daysLeftInCycle = cycleLength - cycleDay + 1
-                daysLeftInCycle
+    fun calculateDaysUntilNextSeason(
+        cycleDay: Int,
+        cycleLength: Int,
+        periodLength: Int,
+        season: Season
+    ): Int {
+        return when (season) {
+            Season.WINTER -> {
+                (periodLength - cycleDay).coerceAtLeast(1)
+            }
+            Season.SPRING -> {
+                val summerStartDay = (cycleLength * 0.45f).toInt() + 1
+                (summerStartDay - cycleDay).coerceAtLeast(1)
+            }
+            Season.SUMMER -> {
+                val autumnStartDay = (cycleLength * 0.60f).toInt() + 1
+                (autumnStartDay - cycleDay).coerceAtLeast(1)
+            }
+            Season.AUTUMN -> {
+                // Days until the start of the next cycle (Day 1)
+                val daysLeft = cycleLength - cycleDay + 1
+                daysLeft.coerceAtLeast(1)
             }
         }
     }
