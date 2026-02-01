@@ -22,7 +22,7 @@ class DayLogViewModel : ViewModel() {
 
     var userProfile by mutableStateOf<UserProfile?>(null)
         private set
-    var cycleDay by mutableStateOf(1)
+    var cycleDay by mutableIntStateOf(1)
         private set
     var season by mutableStateOf(Season.WINTER)
         private set
@@ -33,6 +33,8 @@ class DayLogViewModel : ViewModel() {
     var sleepHours by mutableFloatStateOf(7f)
     var painLevel by mutableIntStateOf(0)
     var waterIntake by mutableIntStateOf(0)
+    var hasExistingLog by mutableStateOf(false)
+        private set
     var isSaving by mutableStateOf(false)
         private set
     var saveSuccess by mutableStateOf<Boolean?>(null)
@@ -53,6 +55,7 @@ class DayLogViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 resetStateToDefaults()
+                hasExistingLog = false
 
                 userProfile = repository.getUserProfile()
                 userProfile?.let { profile ->
@@ -62,20 +65,21 @@ class DayLogViewModel : ViewModel() {
                     season = state.season
                     seasonDescription = season.shortDescription
 
-                    if (season == Season.WINTER) {
-                        isPeriod = true
-                    }
+                    val suggestedIsPeriod = (season == Season.WINTER)
 
                     val existingLog = repository.getLogByDate(date)
-                    existingLog?.let { log ->
-                        isPeriod = log.isPeriod
-                        mood = log.mood
-                        sleepHours = log.sleepHours
-                        painLevel = log.painLevel
-                        waterIntake = log.waterIntakeMl
 
-                        season = log.getSeasonEnum()
+                    if (existingLog != null) {
+                        isPeriod = existingLog.isPeriod
+                        mood = existingLog.mood
+                        sleepHours = existingLog.sleepHours
+                        painLevel = existingLog.painLevel
+                        waterIntake = existingLog.waterIntakeMl
+                        season = existingLog.getSeasonEnum()
                         seasonDescription = season.shortDescription
+                        hasExistingLog = true
+                    } else {
+                        isPeriod = suggestedIsPeriod
                     }
                 }
             } catch (e: Exception) {
@@ -91,8 +95,6 @@ class DayLogViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 isSaving = true
-
-                val finalSeason = if (isPeriod) Season.WINTER else season
 
                 val log = CycleLog(
                     date = date,
@@ -136,5 +138,7 @@ class DayLogViewModel : ViewModel() {
         sleepHours = 7f
         painLevel = 0
         waterIntake = 0
+        errorMessage = null
+        saveSuccess = null
     }
 }

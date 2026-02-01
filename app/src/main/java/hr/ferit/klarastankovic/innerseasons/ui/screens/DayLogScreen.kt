@@ -45,6 +45,7 @@ import hr.ferit.klarastankovic.innerseasons.ui.components.WaterIntakeCounter
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
+import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import java.lang.Exception
@@ -56,6 +57,7 @@ import java.util.Locale
 @Composable
 fun DayLogScreen(
     date: String,
+    isEditable: Boolean,
     navController: NavController,
     viewModel: DayLogViewModel
 ) {
@@ -63,7 +65,6 @@ fun DayLogScreen(
     val season = viewModel.season
     val seasonDescription = viewModel.seasonDescription
     val errorMessage = viewModel.errorMessage
-    val isEditable = date == LocalDate.now().toString()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -77,6 +78,8 @@ fun DayLogScreen(
             date
         }
     }
+
+    val isToday = remember(date) { date == LocalDate.now().toString() }
 
     LaunchedEffect(date) {
         viewModel.loadDataForDate(date)
@@ -157,11 +160,13 @@ fun DayLogScreen(
                         modifier = Modifier.padding(20.dp)
                     )
 
-                    if (!isEditable) {
+                    if (!isEditable && !viewModel.hasExistingLog) {
+                        Spacer(modifier = Modifier.height(40.dp))
+
                         Text(
-                            text = "View only - past dates cannot be edited",
-                            fontSize = 12.sp,
-                            color = TextSecondary,
+                            text = "No other data for this day.",
+                            fontSize = 16.sp,
+                            color = TextPrimary,
                             fontStyle = FontStyle.Italic,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(8.dp)
@@ -171,69 +176,72 @@ fun DayLogScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                 item {
-                     PeriodToggle(
-                         isPeriod = viewModel.isPeriod,
-                         onPeriodChange = { if (isEditable) viewModel.updatePeriodStatus(it) },
-                         season = viewModel.season
-                     )
-                 }
-
-                item {
-                    MoodSelector(
-                        selectedMood = viewModel.mood,
-                        onMoodSelected = { if (isEditable) viewModel.mood = it },
-                        enabled = isEditable
-                    )
-                }
-
-                item {
-                    SleepSlider(
-                        sleepHours = viewModel.sleepHours,
-                        onSleepHoursChange = { if (isEditable) viewModel.sleepHours = it },
-                        enabled = isEditable
-                    )
-                }
-
-                item {
-                    PainLevelSlider(
-                        painLevel = viewModel.painLevel,
-                        onPainLevelChange = { if (isEditable) viewModel.painLevel = it },
-                        enabled = isEditable
-                    )
-                }
-
-                item {
-                    WaterIntakeCounter(
-                        waterIntakeMl = viewModel.waterIntake,
-                        onWaterIntakeChange = { if (isEditable) viewModel.waterIntake = it },
-                        enabled = isEditable
-                    )
-                }
-
-                if (isEditable) {
+                if (isEditable || viewModel.hasExistingLog) {
                     item {
-                        Button(
-                            onClick = {
-                                viewModel.saveLog(date) {
-                                    navController.popBackStack()
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryPink,
-                                contentColor = White
-                            ),
-                            modifier = Modifier
-                                .height(44.dp)
-                                .width(125.dp),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
-                            enabled = !viewModel.isSaving
-                        ) {
-                            Text(
-                                text = if (viewModel.isSaving) "Saving..." else "Save log",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
+                        PeriodToggle(
+                            isPeriod = viewModel.isPeriod,
+                            onPeriodChange = { if (isEditable && isToday) viewModel.updatePeriodStatus(it) },
+                            season = viewModel.season,
+                            enabled = isEditable && isToday
+                        )
+                    }
+
+                    item {
+                        MoodSelector(
+                            selectedMood = viewModel.mood,
+                            onMoodSelected = { if (isEditable) viewModel.mood = it },
+                            enabled = isEditable
+                        )
+                    }
+
+                    item {
+                        SleepSlider(
+                            sleepHours = viewModel.sleepHours,
+                            onSleepHoursChange = { if (isEditable) viewModel.sleepHours = it },
+                            enabled = isEditable
+                        )
+                    }
+
+                    item {
+                        PainLevelSlider(
+                            painLevel = viewModel.painLevel,
+                            onPainLevelChange = { if (isEditable) viewModel.painLevel = it },
+                            enabled = isEditable
+                        )
+                    }
+
+                    item {
+                        WaterIntakeCounter(
+                            waterIntakeMl = viewModel.waterIntake,
+                            onWaterIntakeChange = { if (isEditable) viewModel.waterIntake = it },
+                            enabled = isEditable
+                        )
+                    }
+
+                    if (isEditable) {
+                        item {
+                            Button(
+                                onClick = {
+                                    viewModel.saveLog(date) {
+                                        navController.popBackStack()
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = PrimaryPink,
+                                    contentColor = White
+                                ),
+                                modifier = Modifier
+                                    .height(44.dp)
+                                    .width(125.dp),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
+                                enabled = !viewModel.isSaving
+                            ) {
+                                Text(
+                                    text = if (viewModel.isSaving) "Saving..." else "Save log",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
                 }

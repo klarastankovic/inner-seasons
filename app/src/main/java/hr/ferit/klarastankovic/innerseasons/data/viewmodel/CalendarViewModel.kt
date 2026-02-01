@@ -146,10 +146,24 @@ class CalendarViewModel: ViewModel() {
     fun refreshCalendarData() {
         viewModelScope.launch {
             try {
+                isLoading = true
+
                 userProfile = repository.getUserProfile()
                 allLogs = repository.getAllLogs()
+
+                val realToday = LocalDate.now()
+
+                if (selectedDate.isBefore(realToday)) {
+                    selectedDate = realToday
+
+                    if (currentMonth != YearMonth.from(realToday)) {
+                        currentMonth = YearMonth.from(realToday)
+                    }
+                }
             } catch (e: Exception) {
                 errorMessage = "Failed to refresh: ${e.message}"
+            } finally {
+                isLoading = false
             }
         }
     }

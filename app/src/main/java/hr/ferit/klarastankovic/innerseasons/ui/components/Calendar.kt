@@ -324,6 +324,8 @@ fun CalendarGrid(
                         when (calendarDay) {
                             is CalendarDay.Day -> {
                                 val date = calendarDay.date
+                                val hasLog = hasLogForDate(date)
+                                val today = LocalDate.now()
                                 val isSelected = date == selectedDate
                                 val state = profile?.let {
                                     CycleCalculator.calculateStateForDate(date, it)
@@ -341,10 +343,9 @@ fun CalendarGrid(
                                     season = season,
                                     cycleDay = state?.cycleDay ?: 0,
                                     isPredictedPeriodStart = isPredictedStart,
-                                    isFutureDate = date.isAfter(LocalDate.now()),
-                                    hasLog = hasLogForDate(date),
+                                    isFutureDate = date.isAfter(today),
+                                    hasLog = hasLog,
                                     onClick = {
-                                        val today = LocalDate.now()
                                         val firstPeriodDate = try {
                                             if (profile?.firstDayOfLastPeriod?.isNotEmpty() == true) {
                                                 LocalDate.parse(profile.firstDayOfLastPeriod)
@@ -364,16 +365,16 @@ fun CalendarGrid(
 
                                             date == today -> {
                                                 onDateSelected(date)
-                                                navController.navigate(Routes.getDayLogRoute(date.toString()))
+                                                navController.navigate(Routes.getDayLogRoute(date.toString(), true))
                                             }
 
                                             hasLogForDate(date) -> {
                                                 onDateSelected(date)
-                                                navController.navigate(Routes.getDayLogRoute(date.toString()))
+                                                navController.navigate(Routes.getDayLogRoute(date.toString(), false))
                                             }
 
-                                            firstPeriodDate != null /*&& !date.isAfter(today)*/ -> {
-                                                navController.navigate(Routes.getViewOnlyRoute(date.toString()))
+                                            firstPeriodDate != null -> {
+                                                navController.navigate(Routes.getDayLogRoute(date.toString(), true))
                                             }
 
                                             else -> return@CalendarDayCell

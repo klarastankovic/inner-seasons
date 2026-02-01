@@ -21,6 +21,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
@@ -37,9 +40,16 @@ fun CalendarScreen(
     viewModel: CalendarViewModel,
     navController: NavController
 ) {
-    LaunchedEffect(navController.currentBackStackEntry) {
-        viewModel.refreshCalendarData()
-    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Trigger refresh on screen entry AND whenever app resumes
+    LaunchedEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshCalendarData()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)    }
 
     Scaffold(
         bottomBar = {

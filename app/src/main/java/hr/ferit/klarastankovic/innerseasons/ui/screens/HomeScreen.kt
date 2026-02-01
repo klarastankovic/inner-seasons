@@ -155,7 +155,7 @@ fun HomeScreen(
                                 onClick = {
                                     val todayDate = java.time.LocalDate.now().toString()
 
-                                    navController.navigate(Routes.getDayLogRoute(todayDate)) {
+                                    navController.navigate(Routes.getDayLogRoute(todayDate, true)) {
                                         popUpTo(Routes.HOME) { inclusive = false }
                                     }
                                 },

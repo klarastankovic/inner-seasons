@@ -29,14 +29,12 @@ object Routes {
     const val ONBOARDING = "onboarding"
     const val HOME = "home"
     const val CALENDAR = "calendar"
-    const val DAY_LOG = "day_log/{date}"
-    const val VIEW_ONLY_LOG = "view_only_log/{date}"
+    const val DAY_LOG = "day_log/{date}/{isEditable}"
     const val NO_DATA = "no_data/{date}"
     const val SEASONS = "seasons"
     const val SETTINGS = "settings"
 
-    fun getDayLogRoute(date: String) = "day_log/$date"
-    fun getViewOnlyRoute(date: String) = "view_only_log/$date"
+    fun getDayLogRoute(date: String, isEditable: Boolean) = "day_log/$date/$isEditable"
     fun getNoDataRoute(date: String) = "no_data/$date"
 }
 
@@ -100,26 +98,16 @@ fun AppNavigation() {
         composable(
             route = Routes.DAY_LOG,
             arguments = listOf(
-                navArgument("date") { type = NavType.StringType }
+                navArgument("date") { type = NavType.StringType },
+                navArgument("isEditable") { type = NavType.BoolType }
             )
         ) { backStackEntry ->
             val date = backStackEntry.arguments?.getString("date") ?: ""
+            val isEditable = backStackEntry.arguments?.getBoolean("isEditable") ?: false
+
             DayLogScreen(
                 date = date,
-                navController = navController,
-                viewModel = dayLogViewModel
-            )
-        }
-
-        composable(
-            route = Routes.VIEW_ONLY_LOG,
-            arguments = listOf(
-                navArgument("date") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val date = backStackEntry.arguments?.getString("date") ?: ""
-            ViewOnlyDayLogScreen(
-                date = date,
+                isEditable = isEditable,
                 navController = navController,
                 viewModel = dayLogViewModel
             )
