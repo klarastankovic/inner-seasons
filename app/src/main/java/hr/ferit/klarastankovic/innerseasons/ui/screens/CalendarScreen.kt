@@ -38,7 +38,6 @@ fun CalendarScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Trigger refresh on screen entry AND whenever app resumes
     LaunchedEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {

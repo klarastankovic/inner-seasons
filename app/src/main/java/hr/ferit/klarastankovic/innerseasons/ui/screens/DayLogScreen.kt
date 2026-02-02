@@ -70,7 +70,7 @@ fun DayLogScreen(
     val formattedDate = remember(date) {
         try {
             val input = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val output = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH) // Thu, 25 Dec 2025
+            val output = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH) // e.g. Thu, 25 Dec 2025
             val parsedDate = input.parse(date)
             output.format(parsedDate ?: date)
         } catch (e: Exception) {

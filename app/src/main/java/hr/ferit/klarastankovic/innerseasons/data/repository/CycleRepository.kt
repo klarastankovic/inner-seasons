@@ -6,10 +6,6 @@ import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
 import hr.ferit.klarastankovic.innerseasons.utils.DeviceIdManager
 import kotlinx.coroutines.tasks.await
 
-/**
- * Repository for managing cycle data in Firebase
- * Handles all database operations for logs and user profile
- */
 class CycleRepository {
     private val db = FirebaseFirestore.getInstance()
     private val logsCollection = db.collection("cycle_logs")
@@ -20,7 +16,6 @@ class CycleRepository {
     }
 
     // CYCLE LOGS OPERATIONS
-
     suspend fun getAllLogs(): List<CycleLog> {
         return try {
             val deviceId = getDeviceId()
@@ -54,7 +49,10 @@ class CycleRepository {
             val deviceId = getDeviceId()
             val docId = "${deviceId}_${date}"
 
-            val doc = logsCollection.document(docId).get().await()
+            val doc = logsCollection
+                .document(docId)
+                .get()
+                .await()
 
             if (doc.exists()) {
                 doc.toObject(CycleLog::class.java)?.apply {
@@ -78,7 +76,9 @@ class CycleRepository {
                 deviceId = deviceId
             )
 
-            logsCollection.document(specificLogId).set(logToSave).await()
+            logsCollection.document(specificLogId)
+                .set(logToSave)
+                .await()
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -91,7 +91,11 @@ class CycleRepository {
             val deviceId = getDeviceId()
             val batch = db.batch()
 
-            val logs = logsCollection.whereEqualTo("deviceId", deviceId).get().await()
+            val logs = logsCollection
+                .whereEqualTo("deviceId", deviceId)
+                .get()
+                .await()
+
             for (doc in logs) {
                 batch.delete(doc.reference)
             }
@@ -103,19 +107,59 @@ class CycleRepository {
         }
     }
 
-    // USER PROFILE OPERATIONS
+    suspend fun generateCsvString(): String {
+        val deviceId = getDeviceId()
 
+        val snapshot = logsCollection
+            .whereEqualTo("deviceId", deviceId)
+            .get()
+            .await()
+
+        val logs = snapshot.documents.mapNotNull { doc ->
+            try {
+                doc.toObject(CycleLog::class.java)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        val sortedLogs = logs.sortedBy { it.date }
+
+        if (sortedLogs.isEmpty()) {
+            return "No data found"
+        }
+
+        val builder = StringBuilder()
+        builder.append("Date,Period,Season,Mood,Sleep,Pain,Water\n")
+
+        sortedLogs.forEach { log ->
+            builder.append("${log.date},")
+            builder.append("${if(log.isPeriod) "Yes" else "No"},")
+            builder.append("${log.season},")
+            builder.append("${log.mood},")
+            builder.append("${log.sleepHours},")
+            builder.append("${log.painLevel},")
+            builder.append("${log.waterIntakeMl}\n")
+        }
+        return builder.toString()
+    }
+
+
+    // USER PROFILE OPERATIONS
     suspend fun getUserProfile(): UserProfile? {
         return try {
             val deviceId = getDeviceId()
-            val doc = profilesCollection.document(deviceId).get().await()
+            val doc = profilesCollection
+                .document(deviceId)
+                .get()
+                .await()
 
             if (doc.exists()) {
                 doc.toObject(UserProfile::class.java)
             } else {
                 null
             }
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             null
         }
     }
@@ -154,43 +198,5 @@ class CycleRepository {
         } catch (e: Exception) {
             false
         }
-    }
-
-
-    suspend fun generateCsvString(): String {
-        val deviceId = getDeviceId()
-
-        val snapshot = logsCollection
-            .whereEqualTo("deviceId", deviceId)
-            .get()
-            .await()
-
-        val logs = snapshot.documents.mapNotNull { doc ->
-            try {
-                doc.toObject(CycleLog::class.java)
-            } catch (e: Exception) {
-                null
-            }
-        }
-
-        val sortedLogs = logs.sortedBy { it.date }
-
-        if (sortedLogs.isEmpty()) {
-            return "No data found"
-        }
-
-        val builder = StringBuilder()
-        builder.append("Date,Period,Season,Mood,Sleep,Pain,Water\n")
-
-        sortedLogs.forEach { log ->
-            builder.append("${log.date},")
-            builder.append("${if(log.isPeriod) "Yes" else "No"},")
-            builder.append("${log.season},")
-            builder.append("${log.mood},")
-            builder.append("${log.sleepHours},")
-            builder.append("${log.painLevel},")
-            builder.append("${log.waterIntakeMl}\n")
-        }
-        return builder.toString()
     }
 }

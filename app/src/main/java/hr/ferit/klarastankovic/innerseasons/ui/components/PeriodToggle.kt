@@ -21,7 +21,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
-// Toggle switch for period tracking
 @Composable
 fun PeriodToggle(
     modifier: Modifier = Modifier,

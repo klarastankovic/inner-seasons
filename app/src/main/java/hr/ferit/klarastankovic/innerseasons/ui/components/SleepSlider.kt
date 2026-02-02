@@ -29,7 +29,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
-// Sleep hours slider (0-12 hours)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SleepSlider(

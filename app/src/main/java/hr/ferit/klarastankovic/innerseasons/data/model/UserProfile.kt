@@ -2,10 +2,6 @@ package hr.ferit.klarastankovic.innerseasons.data.model
 
 import java.util.UUID
 
-/**
- * User's cycle profile information
- * Stores cycle configuration and history
- */
 data class UserProfile(
     var id: String = "",
     var deviceId: String = "",

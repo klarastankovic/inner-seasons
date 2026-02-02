@@ -46,6 +46,7 @@ class CalendarViewModel: ViewModel() {
 
                 allLogs = repository.getAllLogs()
                 userProfile = repository.getUserProfile()
+
                 updateSelectedDateLog()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -90,7 +91,8 @@ class CalendarViewModel: ViewModel() {
 
     fun isPredictedPeriodStart(date: LocalDate): Boolean {
         return userProfile?.let { profile ->
-            if (profile.firstDayOfLastPeriod.isEmpty()) return false
+            if (profile.firstDayOfLastPeriod.isEmpty())
+                return false
 
             val cycleState = CycleCalculator.calculateStateForDate(date, profile)
 

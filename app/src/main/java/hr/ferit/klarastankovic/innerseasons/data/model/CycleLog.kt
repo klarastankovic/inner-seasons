@@ -1,9 +1,5 @@
 package hr.ferit.klarastankovic.innerseasons.data.model
 
-/**
- * Represents a daily cycle log entry
- * Stores all tracking data for a specific date
- */
 data class CycleLog(
     var id: String = "",
     var deviceId: String = "",

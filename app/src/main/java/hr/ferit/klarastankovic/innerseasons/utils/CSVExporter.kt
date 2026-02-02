@@ -14,7 +14,10 @@ import kotlin.String
 
 object CSVExporter {
     @RequiresApi(Build.VERSION_CODES.O)
-    fun exportToCSV(context: Context, data: String): Boolean {
+    fun exportToCSV(
+        context: Context,
+        data: String
+    ): Boolean {
         return try {
             val timestamp = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
@@ -32,7 +35,11 @@ object CSVExporter {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun saveToMediaStore(context: Context, fileName: String, data: String): Boolean {
+    private fun saveToMediaStore(
+        context: Context,
+        fileName: String,
+        data: String
+    ): Boolean {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
             put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
@@ -46,6 +53,7 @@ object CSVExporter {
             resolver.openOutputStream(uri)?.use { stream ->
                 stream.write(data.toByteArray())
             }
+
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -62,6 +70,7 @@ object CSVExporter {
             FileOutputStream(file).use { stream ->
                 stream.write(data.toByteArray())
             }
+
             true
         } catch (e: Exception) {
             e.printStackTrace()

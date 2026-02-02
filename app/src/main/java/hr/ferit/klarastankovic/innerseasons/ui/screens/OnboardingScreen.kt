@@ -45,7 +45,7 @@ fun OnboardingScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val selectedDate = remember { mutableStateOf("") }  // ← EMPTY for new user
+    val selectedDate = remember { mutableStateOf("") }
     val cycleLengthInput = remember { mutableStateOf("28") }
     val periodLengthInput = remember { mutableStateOf("5") }
     val snackbarHostState = remember { SnackbarHostState() }

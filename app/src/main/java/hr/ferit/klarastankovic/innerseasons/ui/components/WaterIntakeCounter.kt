@@ -34,7 +34,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
-// Water intake counter with +100ml button
 @Composable
 fun WaterIntakeCounter(
     modifier: Modifier = Modifier,

@@ -17,7 +17,6 @@ object DeviceIdManager {
         var deviceId = sharedPreferences.getString(DEVICE_ID_KEY, null)
 
         if (deviceId == null) {
-            // ← First time: Generate unique ID
             deviceId = UUID.randomUUID().toString()
             sharedPreferences.edit().putString(DEVICE_ID_KEY, deviceId).apply()
         }

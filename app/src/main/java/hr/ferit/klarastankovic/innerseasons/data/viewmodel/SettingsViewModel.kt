@@ -142,6 +142,7 @@ class SettingsViewModel: ViewModel() {
             try {
                 isDeleting = true
                 val success = repository.deleteAllLogs()
+
                 if (success) {
                     onComplete()
                 } else {
