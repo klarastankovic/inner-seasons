@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.ferit.klarastankovic.innerseasons.data.model.CycleLog
-import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
 import hr.ferit.klarastankovic.innerseasons.data.repository.CycleRepository
 import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator
@@ -83,26 +82,6 @@ class CalendarViewModel: ViewModel() {
         updateSelectedDateLog()
     }
 
-    fun getSeasonForDate(date: LocalDate): Season {
-        val log = getLogForDate(date)
-        if (log != null) {
-            return if (log.isPeriod) Season.WINTER else log.getSeasonEnum()
-        }
-
-        return userProfile?.let { profile ->
-            if (profile.firstDayOfLastPeriod.isEmpty()) {
-                Season.WINTER
-            } else {
-                val firstPeriodDate = LocalDate.parse(profile.firstDayOfLastPeriod)
-
-                if (date.isBefore(firstPeriodDate)) {
-                    Season.WINTER
-                }
-                CycleCalculator.calculateStateForDate(date, profile).season
-            }
-        } ?: Season.WINTER
-    }
-
     fun shouldShowSeasonForDate(): Boolean {
         return userProfile?.let { profile ->
             profile.firstDayOfLastPeriod.isNotEmpty()
@@ -123,25 +102,6 @@ class CalendarViewModel: ViewModel() {
 
     fun hasLogForDate(date: LocalDate): Boolean {
         return allLogs.any { it.date == date.toString() }
-    }
-
-    fun isPeriodDay(date: LocalDate): Boolean {
-        val log = getLogForDate(date)
-        return log?.isPeriod ?: false
-    }
-
-    fun getDatesInCurrentMonth(): List<LocalDate> {
-        val firstDay = currentMonth.atDay(1)
-        val lastDay = currentMonth.atEndOfMonth()
-        val dates = mutableListOf<LocalDate>()
-
-        var currentDate = firstDay
-        while (!currentDate.isAfter(lastDay)) {
-            dates.add(currentDate)
-            currentDate = currentDate.plusDays(1)
-        }
-
-        return dates
     }
 
     fun refreshCalendarData() {

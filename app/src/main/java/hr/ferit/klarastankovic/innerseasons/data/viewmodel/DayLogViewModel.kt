@@ -144,10 +144,6 @@ class DayLogViewModel : ViewModel() {
         errorMessage = null
     }
 
-    fun resetSaveStatus() {
-        saveSuccess = null
-    }
-
     private fun resetStateToDefaults() {
         isPeriod = false
         mood = 4

@@ -1,7 +1,6 @@
 package hr.ferit.klarastankovic.innerseasons.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import hr.ferit.klarastankovic.innerseasons.data.model.CycleLog
 import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
 import hr.ferit.klarastankovic.innerseasons.utils.DeviceIdManager

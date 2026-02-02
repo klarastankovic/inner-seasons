@@ -24,8 +24,4 @@ object DeviceIdManager {
 
         return deviceId
     }
-
-    fun clearDeviceId() {
-        sharedPreferences.edit().remove(DEVICE_ID_KEY).apply()
-    }
 }

@@ -43,7 +43,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.SettingsViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
-import hr.ferit.klarastankovic.innerseasons.ui.components.OutlinedNumberInputField
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite

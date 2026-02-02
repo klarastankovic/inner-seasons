@@ -97,10 +97,6 @@ object CycleCalculator {
         }
     }
 
-    fun calculateSeasonForDate(date: LocalDate, profile: UserProfile): Season {
-        return calculateStateForDate(date, profile).season
-    }
-
     fun predictNextSeason(profile: UserProfile): Pair<Season, LocalDate> {
         val currentState = calculateCurrentState(profile)
 
@@ -110,11 +106,5 @@ object CycleCalculator {
         val nextSeasonDate = LocalDate.now().plusDays(currentState.daysUntilNextSeason.toLong())
 
         return Pair(nextSeason, nextSeasonDate)
-    }
-
-    fun isPeriodDay(date: LocalDate, profile: UserProfile): Boolean {
-        if (profile.firstDayOfLastPeriod.isEmpty()) return false
-        val cycleDay = calculateStateForDate(date, profile).cycleDay
-        return cycleDay <= profile.averagePeriodLength
     }
 }
