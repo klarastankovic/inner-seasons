@@ -25,17 +25,25 @@ class CycleRepository {
     suspend fun getAllLogs(): List<CycleLog> {
         return try {
             val deviceId = getDeviceId()
-            logsCollection
+
+            val snapshot = logsCollection
                 .whereEqualTo("deviceId", deviceId)
-                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .await()
-                .documents
-                .mapNotNull { doc ->
+
+            val logs = snapshot.documents.mapNotNull { doc ->
+                try {
                     doc.toObject(CycleLog::class.java)?.apply {
                         id = doc.id
                     }
+                } catch (e: Exception) {
+                    null
                 }
+            }
+
+            val sortedLogs = logs.sortedByDescending { it.date }
+
+            sortedLogs
         } catch (e: Exception) {
             emptyList()
         }
@@ -61,29 +69,6 @@ class CycleRepository {
         }
     }
 
-    // @param startDate Format: "yyyy-MM-dd"
-    // @param endDate Format: "yyyy-MM-dd"
-    suspend fun getLogsInRange(startDate: String, endDate: String): List<CycleLog> {
-        return try {
-            val deviceId = getDeviceId()
-            logsCollection
-                .whereEqualTo("deviceId", deviceId)
-                .whereGreaterThanOrEqualTo("date", startDate)
-                .whereLessThanOrEqualTo("date", endDate)
-                .orderBy("date", Query.Direction.ASCENDING)
-                .get()
-                .await()
-                .documents
-                .mapNotNull { doc ->
-                    doc.toObject(CycleLog::class.java)?.apply {
-                        id = doc.id
-                    }
-                }
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
     suspend fun saveLog(log: CycleLog): Boolean {
         return try {
             val deviceId = getDeviceId()
@@ -102,22 +87,6 @@ class CycleRepository {
         }
     }
 
-    suspend fun deleteLog(logId: String): Boolean {
-        return try {
-            val deviceId = getDeviceId()
-            val log = logsCollection.document(logId).get().await()
-
-            if (log.getString("deviceId") != deviceId) {
-                return false  // Not device owner
-            }
-
-            logsCollection.document(logId).delete().await()
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
     suspend fun deleteAllLogs(): Boolean {
         return try {
             val deviceId = getDeviceId()
@@ -128,18 +97,12 @@ class CycleRepository {
                 batch.delete(doc.reference)
             }
 
-            val profileRef = profilesCollection.document(deviceId)
-            batch.delete(profileRef)
-
             batch.commit().await()
-
-            DeviceIdManager.clearDeviceId()
             true
         } catch (e: Exception) {
             false
         }
     }
-
 
     // USER PROFILE OPERATIONS
 
@@ -181,7 +144,6 @@ class CycleRepository {
             val profileToSave = profile.copy(
                 id = deviceId,
                 deviceId = deviceId,
-                updatedAt = System.currentTimeMillis(),
                 isOnboarded = true
             )
 
@@ -195,29 +157,41 @@ class CycleRepository {
         }
     }
 
-    suspend fun profileExists(): Boolean {
-        return try {
-            val deviceId = getDeviceId()
-            profilesCollection
-                .document(deviceId)
-                .get()
-                .await()
-                .exists()
-        } catch (e: Exception) {
-            false
-        }
-    }
 
-    suspend fun deleteUserProfile(): Boolean {
-        return try {
-            val deviceId = getDeviceId()
-            profilesCollection
-                .document(deviceId)
-                .delete()
-                .await()
-            true
-        } catch (e: Exception) {
-            false
+    suspend fun generateCsvString(): String {
+        val deviceId = getDeviceId()
+
+        val snapshot = logsCollection
+            .whereEqualTo("deviceId", deviceId)
+            .get()
+            .await()
+
+        val logs = snapshot.documents.mapNotNull { doc ->
+            try {
+                doc.toObject(CycleLog::class.java)
+            } catch (e: Exception) {
+                null
+            }
         }
+
+        val sortedLogs = logs.sortedBy { it.date }
+
+        if (sortedLogs.isEmpty()) {
+            return "No data found"
+        }
+
+        val builder = StringBuilder()
+        builder.append("Date,Period,Season,Mood,Sleep,Pain,Water\n")
+
+        sortedLogs.forEach { log ->
+            builder.append("${log.date},")
+            builder.append("${if(log.isPeriod) "Yes" else "No"},")
+            builder.append("${log.season},")
+            builder.append("${log.mood},")
+            builder.append("${log.sleepHours},")
+            builder.append("${log.painLevel},")
+            builder.append("${log.waterIntakeMl}\n")
+        }
+        return builder.toString()
     }
 }

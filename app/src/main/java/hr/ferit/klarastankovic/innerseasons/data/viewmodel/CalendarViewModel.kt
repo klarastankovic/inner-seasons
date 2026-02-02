@@ -86,7 +86,7 @@ class CalendarViewModel: ViewModel() {
     fun getSeasonForDate(date: LocalDate): Season {
         val log = getLogForDate(date)
         if (log != null) {
-            return log.getSeasonEnum()
+            return if (log.isPeriod) Season.WINTER else log.getSeasonEnum()
         }
 
         return userProfile?.let { profile ->
@@ -97,14 +97,13 @@ class CalendarViewModel: ViewModel() {
 
                 if (date.isBefore(firstPeriodDate)) {
                     Season.WINTER
-                } else {
-                    CycleCalculator.calculateStateForDate(date, profile).season
                 }
+                CycleCalculator.calculateStateForDate(date, profile).season
             }
         } ?: Season.WINTER
     }
 
-    fun shouldShowSeasonForDate(date: LocalDate): Boolean {
+    fun shouldShowSeasonForDate(): Boolean {
         return userProfile?.let { profile ->
             profile.firstDayOfLastPeriod.isNotEmpty()
         } ?: false
@@ -112,6 +111,8 @@ class CalendarViewModel: ViewModel() {
 
     fun isPredictedPeriodStart(date: LocalDate): Boolean {
         return userProfile?.let { profile ->
+            if (profile.firstDayOfLastPeriod.isEmpty()) return false
+
             val cycleState = CycleCalculator.calculateStateForDate(date, profile)
 
             val isFutureOrToday = !date.isBefore(LocalDate.now())
@@ -160,6 +161,8 @@ class CalendarViewModel: ViewModel() {
                         currentMonth = YearMonth.from(realToday)
                     }
                 }
+
+                updateSelectedDateLog()
             } catch (e: Exception) {
                 errorMessage = "Failed to refresh: ${e.message}"
             } finally {

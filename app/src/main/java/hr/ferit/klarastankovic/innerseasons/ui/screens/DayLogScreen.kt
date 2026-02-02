@@ -46,7 +46,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
-import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -180,7 +179,11 @@ fun DayLogScreen(
                     item {
                         PeriodToggle(
                             isPeriod = viewModel.isPeriod,
-                            onPeriodChange = { if (isEditable && isToday) viewModel.updatePeriodStatus(it) },
+                            onPeriodChange = {
+                                if (isEditable && isToday)  {
+                                    viewModel.updatePeriodStatus(it, date)
+                                }
+                            },
                             season = viewModel.season,
                             enabled = isEditable && isToday
                         )

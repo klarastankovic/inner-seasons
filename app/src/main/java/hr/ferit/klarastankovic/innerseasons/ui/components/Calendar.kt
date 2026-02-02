@@ -2,7 +2,6 @@ package hr.ferit.klarastankovic.innerseasons.ui.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +41,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.model.UserProfile
@@ -55,10 +51,8 @@ import hr.ferit.klarastankovic.innerseasons.data.viewmodel.CalendarViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
-import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator
-import hr.ferit.klarastankovic.innerseasons.utils.CycleCalculator.isPeriodDay
 import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
@@ -70,7 +64,6 @@ import java.util.Locale
 fun Calendar(
     viewModel: CalendarViewModel,
     navController: NavController,
-    modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -101,8 +94,7 @@ fun Calendar(
                 selectedDate = viewModel.selectedDate,
                 navController = navController,
                 onDateSelected = { date -> viewModel.selectDate(date) },
-                getSeasonForDate = { date -> viewModel.getSeasonForDate(date) },
-                shouldShowSeasonForDate = { date -> viewModel.shouldShowSeasonForDate(date) },
+                shouldShowSeasonForDate = { viewModel.shouldShowSeasonForDate() },
                 isPredictedPeriodStart = { date -> viewModel.isPredictedPeriodStart(date) },
                 hasLogForDate = { date -> viewModel.hasLogForDate(date) }
             )
@@ -274,7 +266,6 @@ fun CalendarGrid(
     selectedDate: LocalDate,
     navController: NavController,
     onDateSelected: (LocalDate) -> Unit,
-    getSeasonForDate: (LocalDate) -> Season,
     shouldShowSeasonForDate: (LocalDate) -> Boolean,
     isPredictedPeriodStart: (LocalDate) -> Boolean,
     hasLogForDate: (LocalDate) -> Boolean

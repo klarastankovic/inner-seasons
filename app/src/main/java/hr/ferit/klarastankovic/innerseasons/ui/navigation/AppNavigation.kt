@@ -22,7 +22,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.screens.OnboardingScreen
 import hr.ferit.klarastankovic.innerseasons.ui.screens.SeasonsScreen
 import hr.ferit.klarastankovic.innerseasons.ui.screens.SettingsScreen
 import hr.ferit.klarastankovic.innerseasons.ui.screens.SplashScreen
-import hr.ferit.klarastankovic.innerseasons.ui.screens.ViewOnlyDayLogScreen
 
 object Routes {
     const val SPLASH = "splash"

@@ -2,12 +2,10 @@ package hr.ferit.klarastankovic.innerseasons.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -35,8 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import hr.ferit.klarastankovic.innerseasons.data.model.CycleLog
-import hr.ferit.klarastankovic.innerseasons.data.model.Season
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.HomeViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.AddLogFAB
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
@@ -47,7 +39,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
-import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -72,17 +63,6 @@ fun HomeScreen(
             viewModel.clearError()
         }
     }
-
-    val testLog = CycleLog(
-        id = "test",
-        date = "2026-01-07",
-        isPeriod = false,
-        mood = 4,
-        sleepHours = 7.5f,
-        painLevel = 2,
-        waterIntakeMl = 1500,
-        season = Season.SPRING.name
-    )
 
     Scaffold(
         bottomBar = {
@@ -173,7 +153,6 @@ fun HomeScreen(
                             modifier = Modifier.padding(8.dp)
                         )
                     } else {
-                        val displayLog = todayLog ?: testLog
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
@@ -181,25 +160,25 @@ fun HomeScreen(
                             item {
                                 LogInfoCard(
                                     label = "Mood",
-                                    value = displayLog.getMoodEmoji()
+                                    value = todayLog.getMoodEmoji()
                                 )
                             }
                             item {
                                 LogInfoCard(
                                     label = "Sleep",
-                                    value = displayLog.getFormattedSleepHours()
+                                    value = todayLog.getFormattedSleepHours()
                                 )
                             }
                             item {
                                 LogInfoCard(
                                     label = "Pain",
-                                    value = displayLog.getFormattedPainLevel()
+                                    value = todayLog.getFormattedPainLevel()
                                 )
                             }
                             item {
                                 LogInfoCard(
                                     label = "Water",
-                                    value = displayLog.getFormattedWaterIntake(),
+                                    value = todayLog.getFormattedWaterIntake(),
                                     showPlusIcon = true,
                                     onClick = {
                                         viewModel.updateWaterIntake(100)

@@ -54,64 +54,27 @@ class SettingsViewModel: ViewModel() {
         }
     }
 
-    fun updateProfile(
-        averageCycleLength: Int,
-        averagePeriodLength: Int
-    ) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateProfileWithFirstPeriod(startDate: LocalDate, cycleLength: Int, periodLength: Int) {
         viewModelScope.launch {
             try {
                 isSaving = true
-                errorMessage = null
-
-                val currentProfile = userProfile ?: repository.getOrCreateUserProfile()
-
+                val currentProfile = userProfile ?: UserProfile()
                 val updatedProfile = currentProfile.copy(
-                    averageCycleLength = averageCycleLength,
-                    averagePeriodLength = averagePeriodLength,
-                    updatedAt = System.currentTimeMillis()
+                    firstDayOfLastPeriod = startDate.toString(),
+                    averageCycleLength = cycleLength,
+                    averagePeriodLength = periodLength,
+                    isOnboarded = true
                 )
 
                 val success = repository.saveUserProfile(updatedProfile)
                 if (success) {
                     userProfile = updatedProfile
                 } else {
-                    errorMessage = "Failed to save profile"
+                    errorMessage = "Failed to save your settings."
                 }
             } catch (e: Exception) {
-                errorMessage = "Error saving profile: ${e.message}"
-            } finally {
-                isSaving = false
-            }
-        }
-    }
-
-    fun updateProfileWithFirstPeriod(
-        firstDayOfLastPeriod: LocalDate,
-        averageCycleLength: Int,
-        averagePeriodLength: Int
-    ) {
-        viewModelScope.launch {
-            try {
-                isSaving = true
-                errorMessage = null
-
-                val currentProfile = userProfile ?: repository.getOrCreateUserProfile()
-
-                val updatedProfile = currentProfile.copy(
-                    firstDayOfLastPeriod = firstDayOfLastPeriod.toString(),
-                    averageCycleLength = averageCycleLength,
-                    averagePeriodLength = averagePeriodLength,
-                    updatedAt = System.currentTimeMillis()
-                )
-
-                val success = repository.saveUserProfile(updatedProfile)
-                if (success) {
-                    userProfile = updatedProfile
-                } else {
-                    errorMessage = "Failed to save profile"
-                }
-            } catch (e: Exception) {
-                errorMessage = "Error saving profile: ${e.message}"
+                errorMessage = "Error: ${e.message}"
             } finally {
                 isSaving = false
             }
@@ -132,14 +95,14 @@ class SettingsViewModel: ViewModel() {
                     return@launch
                 }
 
-                val logs = repository.getAllLogs()
-                if (logs.isEmpty()) {
+                val csvString = repository.generateCsvString()
+                if (csvString == "No data found") {
                     exportSuccess = false
                     exportMessage = "No data to export"
                     return@launch
                 }
 
-                val success = CSVExporter.exportToCSV(context, logs)
+                val success = CSVExporter.exportToCSV(context, csvString)
                 exportSuccess = success
 
                 if (success) {
@@ -167,22 +130,32 @@ class SettingsViewModel: ViewModel() {
     }
 
     fun isValidCycleLength(length: Int): Boolean {
-        return length in UserProfile.CYCLE_LENGHT_RANGE
+        return length in UserProfile.CYCLE_LENGTH_RANGE
     }
 
     fun isValidPeriodLength(length: Int): Boolean {
-        return length in UserProfile.PERIOD_LENGHT_RANGE
+        return length in UserProfile.PERIOD_LENGTH_RANGE
     }
 
     fun deleteAllLogs(onComplete: () -> Unit) {
         viewModelScope.launch {
-            isDeleting = true
-            val success = repository.deleteAllLogs()
-            if (success) {
-                // This is where you'd also clear local preferences if needed
-                onComplete()
+            try {
+                isDeleting = true
+                val success = repository.deleteAllLogs()
+                if (success) {
+                    onComplete()
+                } else {
+                    errorMessage = "Failed to delete data"
+                }
+            } catch (e: Exception) {
+                errorMessage = "Error deleting data: ${e.message}"
+            } finally {
+                isDeleting = false
             }
-            isDeleting = false
         }
+    }
+
+    fun refreshProfile() {
+        loadProfile()
     }
 }

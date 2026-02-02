@@ -1,7 +1,6 @@
 package hr.ferit.klarastankovic.innerseasons.ui.screens
 
 import android.os.Build
-import android.window.SplashScreen
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,12 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import hr.ferit.klarastankovic.innerseasons.R
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.HomeViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.theme.BackgroundWhite
 import hr.ferit.klarastankovic.innerseasons.ui.theme.Black
-import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)

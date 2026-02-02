@@ -1,7 +1,5 @@
 package hr.ferit.klarastankovic.innerseasons.data.model
 
-import java.sql.Timestamp
-
 /**
  * Represents a daily cycle log entry
  * Stores all tracking data for a specific date

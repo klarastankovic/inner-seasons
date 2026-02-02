@@ -1,7 +1,6 @@
 package hr.ferit.klarastankovic.innerseasons.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -22,14 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
-import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
 
 /**
@@ -71,7 +67,6 @@ fun MoodSelector(
         ) {
             MoodOption(
                 emoji = "😢",
-                moodValue = 1,
                 isSelected = selectedMood == 1,
                 onClick = { if (enabled) onMoodSelected(1) },
                 enabled = enabled
@@ -79,7 +74,6 @@ fun MoodSelector(
 
             MoodOption(
                 emoji = "😕",
-                moodValue = 2,
                 isSelected = selectedMood == 2,
                 onClick = { if (enabled) onMoodSelected(2) },
                 enabled = enabled
@@ -87,7 +81,6 @@ fun MoodSelector(
 
             MoodOption(
                 emoji = "😐",
-                moodValue = 3,
                 isSelected = selectedMood == 3,
                 onClick = { if (enabled) onMoodSelected(3) },
                 enabled = enabled
@@ -95,7 +88,6 @@ fun MoodSelector(
 
             MoodOption(
                 emoji = "🙂",
-                moodValue = 4,
                 isSelected = selectedMood == 4,
                 onClick = { if (enabled) onMoodSelected(4) },
                 enabled = enabled
@@ -103,7 +95,6 @@ fun MoodSelector(
 
             MoodOption(
                 emoji = "😄",
-                moodValue = 5,
                 isSelected = selectedMood == 5,
                 onClick = { if (enabled) onMoodSelected(5) },
                 enabled = enabled
@@ -115,7 +106,6 @@ fun MoodSelector(
 @Composable
 private fun MoodOption(
     emoji: String,
-    moodValue: Int,
     isSelected: Boolean,
     onClick: () -> Unit,
     enabled: Boolean = true

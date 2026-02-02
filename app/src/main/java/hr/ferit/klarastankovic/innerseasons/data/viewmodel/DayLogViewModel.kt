@@ -41,46 +41,39 @@ class DayLogViewModel : ViewModel() {
         private set
     var errorMessage by mutableStateOf<String?>(null)
 
-    fun updatePeriodStatus(isPeriodDay: Boolean) {
-        isPeriod = isPeriodDay
-
-        if (isPeriodDay && season != Season.WINTER) {
-            season = Season.WINTER
-            seasonDescription = Season.WINTER.shortDescription
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadDataForDate(date: String) {
         viewModelScope.launch {
             try {
                 resetStateToDefaults()
-                hasExistingLog = false
-
                 userProfile = repository.getUserProfile()
-                userProfile?.let { profile ->
-                    val localDate = LocalDate.parse(date)
-                    val state = CycleCalculator.calculateStateForDate(localDate, profile)
-                    cycleDay = state.cycleDay
-                    season = state.season
+                val localDate = LocalDate.parse(date)
+
+                val existingLog = repository.getLogByDate(date)
+
+                if (existingLog != null) {
+                    isPeriod = existingLog.isPeriod
+                    mood = existingLog.mood
+                    sleepHours = existingLog.sleepHours
+                    painLevel = existingLog.painLevel
+                    waterIntake = existingLog.waterIntakeMl
+                    season = existingLog.getSeasonEnum()
                     seasonDescription = season.shortDescription
+                    hasExistingLog = true
 
-                    val suggestedIsPeriod = (season == Season.WINTER)
-
-                    val existingLog = repository.getLogByDate(date)
-
-                    if (existingLog != null) {
-                        isPeriod = existingLog.isPeriod
-                        mood = existingLog.mood
-                        sleepHours = existingLog.sleepHours
-                        painLevel = existingLog.painLevel
-                        waterIntake = existingLog.waterIntakeMl
-                        season = existingLog.getSeasonEnum()
-                        seasonDescription = season.shortDescription
-                        hasExistingLog = true
-                    } else {
-                        isPeriod = suggestedIsPeriod
+                    userProfile?.let { profile ->
+                        val state = CycleCalculator.calculateStateForDate(localDate, profile)
+                        cycleDay = state.cycleDay
                     }
+                } else {
+                    userProfile?.let { profile ->
+                        val state = CycleCalculator.calculateStateForDate(LocalDate.parse(date), profile)
+                        season = state.season
+                        seasonDescription = state.season.shortDescription
+                        cycleDay = state.cycleDay
+                        isPeriod = (season == Season.WINTER)
+                    }
+                    hasExistingLog = false
                 }
             } catch (e: Exception) {
                 errorMessage = "Failed to load data: ${e.message}"
@@ -88,6 +81,25 @@ class DayLogViewModel : ViewModel() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updatePeriodStatus(isPeriodDay: Boolean, date: String) {
+        isPeriod = isPeriodDay
+
+        if (isPeriodDay) {
+            season = Season.WINTER
+            seasonDescription = Season.WINTER.shortDescription
+        } else {
+            userProfile?.let { profile ->
+                val localDate = LocalDate.parse(date)
+                val state = CycleCalculator.calculateStateForDate(localDate, profile)
+                season = state.season
+                seasonDescription = state.season.shortDescription
+            }
+            return
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveLog(
         date: String,
         onSuccess: () -> Unit
@@ -96,6 +108,12 @@ class DayLogViewModel : ViewModel() {
             try {
                 isSaving = true
 
+                val finalSeason = if (isPeriod) Season.WINTER else {
+                    userProfile?.let {
+                        CycleCalculator.calculateStateForDate(LocalDate.parse(date), it).season
+                    } ?: season
+                }
+
                 val log = CycleLog(
                     date = date,
                     isPeriod = isPeriod,
@@ -103,18 +121,16 @@ class DayLogViewModel : ViewModel() {
                     sleepHours = sleepHours,
                     painLevel = painLevel,
                     waterIntakeMl = waterIntake,
-                    season = season.name,
+                    season = finalSeason.name,
                     timestamp = System.currentTimeMillis()
                 )
 
                 val success = repository.saveLog(log)
                 saveSuccess = success
 
-                if (success) {
-                    onSuccess()
-                } else {
-                    errorMessage = "Failed to save log"
-                }
+                if (success) onSuccess()
+                else errorMessage = "Failed to save log"
+
             } catch (e: Exception) {
                 saveSuccess = false
                 errorMessage = "Error saving log: ${e.message}"

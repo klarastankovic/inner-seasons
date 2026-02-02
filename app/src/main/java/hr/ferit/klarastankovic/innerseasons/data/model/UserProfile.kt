@@ -12,8 +12,6 @@ data class UserProfile(
     val firstDayOfLastPeriod: String = "", // Format: "yyyy-MM-dd"
     val averageCycleLength: Int = 28, // Average cycle length in days (default 28)
     val averagePeriodLength: Int = 5, // Average period duration in days (default 5)
-    val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis(),
     var installId: String = "",
     var isOnboarded: Boolean = false
 ) {
@@ -21,12 +19,9 @@ data class UserProfile(
         return firstDayOfLastPeriod.isNotEmpty()  && isOnboarded
     }
 
-    /**
-     * Get cycle length options for UI picker
-     */
     companion object {
-        val CYCLE_LENGHT_RANGE = 21..35
-        val PERIOD_LENGHT_RANGE = 3..7
+        val CYCLE_LENGTH_RANGE = 21..35
+        val PERIOD_LENGTH_RANGE = 3..7
 
         fun createDefault(deviceId: String): UserProfile {
             return UserProfile(
@@ -35,8 +30,6 @@ data class UserProfile(
                 firstDayOfLastPeriod = "",
                 averageCycleLength = 28,
                 averagePeriodLength = 5,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis(),
                 installId = generateInstallId()
             )
         }

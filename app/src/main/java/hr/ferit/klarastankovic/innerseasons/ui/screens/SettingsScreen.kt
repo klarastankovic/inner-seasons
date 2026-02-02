@@ -28,10 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -45,7 +43,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import hr.ferit.klarastankovic.innerseasons.data.viewmodel.SettingsViewModel
 import hr.ferit.klarastankovic.innerseasons.ui.components.BottomNavBar
-import hr.ferit.klarastankovic.innerseasons.ui.components.DateInputField
 import hr.ferit.klarastankovic.innerseasons.ui.components.OutlinedNumberInputField
 import hr.ferit.klarastankovic.innerseasons.ui.components.ScreenTitle
 import hr.ferit.klarastankovic.innerseasons.ui.navigation.Routes
@@ -55,8 +52,6 @@ import hr.ferit.klarastankovic.innerseasons.ui.theme.PrimaryPink
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextPrimary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.TextSecondary
 import hr.ferit.klarastankovic.innerseasons.ui.theme.White
-import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -72,10 +67,6 @@ fun SettingsScreen(
     val errorMessage = viewModel.errorMessage
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val cycleLengthInput = remember { mutableStateOf(userProfile?.averageCycleLength?.toString() ?: "28") }
-    val periodLengthInput = remember { mutableStateOf(userProfile?.averagePeriodLength?.toString() ?: "5") }
-
     val showDeleteDialog = remember { mutableStateOf(false) }
 
     if (showDeleteDialog.value) {
@@ -112,28 +103,15 @@ fun SettingsScreen(
         )
     }
 
-    LaunchedEffect(userProfile) {
-        userProfile?.let {
-            cycleLengthInput.value = it.averageCycleLength.toString()
-            periodLengthInput.value = it.averagePeriodLength.toString()
-        }
+    LaunchedEffect(Unit) {
+        viewModel.refreshProfile()
     }
 
-    LaunchedEffect(exportSuccess) {
-        if (exportSuccess == true) {
-            exportMessage?.let {
-                snackbarHostState.showSnackbar(it)
-            }
-            viewModel.resetExportStatus()
-        } else if (exportSuccess == false) {
-            errorMessage?.let {
-                snackbarHostState.showSnackbar(it)
-            }
+    LaunchedEffect(exportSuccess, errorMessage) {
+        if (exportSuccess != null) {
+            exportMessage?.let { snackbarHostState.showSnackbar(it) }
             viewModel.resetExportStatus()
         }
-    }
-
-    LaunchedEffect(errorMessage) {
         errorMessage?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
@@ -219,11 +197,11 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    OutlinedNumberInputField(
-                        value = cycleLengthInput.value,
-                        onValueChange = { cycleLengthInput.value = it },
-                        placeholder = "21-35",
-                        modifier = Modifier.width(75.dp)
+                    Text(
+                        text = "${userProfile?.averageCycleLength} days",
+                        fontSize = 16.sp,
+                        color = TextSecondary,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
 
@@ -242,54 +220,12 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    OutlinedNumberInputField(
-                        value = periodLengthInput.value,
-                        onValueChange = { periodLengthInput.value = it },
-                        placeholder = "3-7",
-                        modifier = Modifier.width(75.dp)
+                    Text(
+                        text = "${userProfile?.averagePeriodLength} days",
+                        fontSize = 16.sp,
+                        color = TextSecondary,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            val cycleLength = cycleLengthInput.value.toIntOrNull() ?: 28
-                            val periodLength = periodLengthInput.value.toIntOrNull() ?: 5
-
-                            when {
-                                !viewModel.isValidCycleLength(cycleLength) -> {
-                                    viewModel.errorMessage =
-                                        "Cycle length must be between 21-35 days"
-                                }
-                                !viewModel.isValidPeriodLength(periodLength) -> {
-                                    viewModel.errorMessage =
-                                        "Period length must be between 3-7 days"
-                                }
-                                else -> {
-                                    viewModel.updateProfile(cycleLength, periodLength)
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .height(44.dp)
-                            .width(100.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryPink,
-                            contentColor = White
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
-                        enabled = !viewModel.isSaving
-                    ) {
-                        Text(
-                            text = if (viewModel.isSaving) "Saving" else "Save",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))

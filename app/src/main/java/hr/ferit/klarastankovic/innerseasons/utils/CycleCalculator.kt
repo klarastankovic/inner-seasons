@@ -117,16 +117,4 @@ object CycleCalculator {
         val cycleDay = calculateStateForDate(date, profile).cycleDay
         return cycleDay <= profile.averagePeriodLength
     }
-
-    fun getCurrentMonthDateRange(): Pair<LocalDate, LocalDate> {
-        val today = LocalDate.now()
-        val firstDayOfMonth = today.withDayOfMonth(1)
-        val lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth())
-
-        return Pair(firstDayOfMonth, lastDayOfMonth)
-    }
-
-    fun formatCycleDay(cycleDay: Int): String {
-        return "Day $cycleDay of your cycle"
-    }
 }

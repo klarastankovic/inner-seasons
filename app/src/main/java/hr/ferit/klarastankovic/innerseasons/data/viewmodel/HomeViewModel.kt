@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,9 +26,9 @@ class HomeViewModel: ViewModel() {
         private set
     var currentSeason by mutableStateOf(Season.WINTER)
         private set
-    var currentCycleDay by mutableStateOf(1)
+    var currentCycleDay by mutableIntStateOf(1)
         private set
-    var daysUntilNextSeason by mutableStateOf(0)
+    var daysUntilNextSeason by mutableIntStateOf(0)
         private set
     var nextSeason by mutableStateOf<Pair<Season, LocalDate>?>(null)
     var isLoading by mutableStateOf(true)
@@ -61,42 +62,6 @@ class HomeViewModel: ViewModel() {
                 errorMessage = "Failed to load data: ${e.message}"
             } finally {
                 isLoading = false
-            }
-        }
-    }
-
-    fun saveTodayLog(
-        isPeriod: Boolean,
-        mood: Int,
-        sleepHours: Float,
-        painLevel: Int,
-        waterIntakeMl: Int
-    ) {
-        viewModelScope.launch {
-            try {
-                val today = LocalDate.now().toString()
-
-                val finalSeason = if (isPeriod) Season.WINTER else currentSeason
-
-                val log = CycleLog(
-                    id = todayLog?.id ?: "",
-                    date = today,
-                    isPeriod = isPeriod,
-                    mood = mood,
-                    sleepHours = sleepHours,
-                    painLevel = painLevel,
-                    waterIntakeMl = waterIntakeMl,
-                    season = currentSeason.name
-                )
-
-                val success = repository.saveLog(log)
-                if (success) {
-                    loadData()
-                } else {
-                    errorMessage = "Failed to log"
-                }
-            } catch(e: Exception) {
-                errorMessage = "Error saving log: ${e.message}"
             }
         }
     }
