@@ -76,7 +76,7 @@ class HomeViewModel: ViewModel() {
 
             val updatedLog = currentLog.copy(
                 waterIntakeMl = newWaterLevel,
-                timestamp = System.currentTimeMillis()
+                recordedAt = System.currentTimeMillis()
             )
 
             repository.saveLog(updatedLog)

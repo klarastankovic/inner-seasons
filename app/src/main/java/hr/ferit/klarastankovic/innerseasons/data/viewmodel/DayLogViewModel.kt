@@ -122,7 +122,7 @@ class DayLogViewModel : ViewModel() {
                     painLevel = painLevel,
                     waterIntakeMl = waterIntake,
                     season = finalSeason.name,
-                    timestamp = System.currentTimeMillis()
+                    recordedAt = System.currentTimeMillis()
                 )
 
                 val success = repository.saveLog(log)

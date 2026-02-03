@@ -10,7 +10,7 @@ data class CycleLog(
     val painLevel: Int = 0, // Scale 0-10: 0=no pain, 10=severe pain
     val waterIntakeMl: Int = 0, // Water intake in millilitres
     val season: String = Season.WINTER.name,
-    val timestamp: Long = System.currentTimeMillis()
+    val recordedAt: Long = System.currentTimeMillis()
 ) {
     fun getSeasonEnum(): Season {
         return try {
